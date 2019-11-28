@@ -18,10 +18,6 @@ package com.alibaba.fescar.server.lock;
 
 public class LockManagerFactory {
 
-    private static class SingletonHolder {
-        private static LockManager INSTANCE = new DefaultLockManagerImpl();
-    }
-
     public static final LockManager get() {
         return SingletonHolder.INSTANCE;
     }
@@ -31,5 +27,9 @@ public class LockManagerFactory {
      */
     public static void set(LockManager lockManager) {
         SingletonHolder.INSTANCE = lockManager;
+    }
+
+    private static class SingletonHolder {
+        private static LockManager INSTANCE = new DefaultLockManagerImpl();
     }
 }

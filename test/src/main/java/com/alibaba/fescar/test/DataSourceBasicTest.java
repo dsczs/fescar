@@ -22,20 +22,10 @@ import com.alibaba.fescar.core.model.BranchStatus;
 import com.alibaba.fescar.core.model.BranchType;
 import com.alibaba.fescar.core.model.Resource;
 import com.alibaba.fescar.rm.datasource.DataSourceManager;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class DataSourceBasicTest {
-    public void runBusiness(JdbcTemplate jdbcTemplate) {
-//        jdbcTemplate.update("insert into user0 (id, name, gmt) values (?, ?, ?)",
-//                new Object[] { 1, "xxx", new Date() });
-        jdbcTemplate.update("update user0 set name = 'yyyy' where id = ?", new Object[] {1});
-//        jdbcTemplate.update("delete from user0 where id = ?", new Object[] {1});
-
-
-    }
-
     public static void main(String[] args) {
         DataSourceManager.set(new DataSourceManager() {
 
@@ -90,5 +80,14 @@ public class DataSourceBasicTest {
 
         context.close();
         System.exit(0);
+    }
+
+    public void runBusiness(JdbcTemplate jdbcTemplate) {
+//        jdbcTemplate.update("insert into user0 (id, name, gmt) values (?, ?, ?)",
+//                new Object[] { 1, "xxx", new Date() });
+        jdbcTemplate.update("update user0 set name = 'yyyy' where id = ?", new Object[]{1});
+//        jdbcTemplate.update("delete from user0 where id = ?", new Object[] {1});
+
+
     }
 }

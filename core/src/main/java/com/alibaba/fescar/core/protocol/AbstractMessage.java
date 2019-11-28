@@ -16,14 +16,29 @@
 
 package com.alibaba.fescar.core.protocol;
 
-import java.io.Serializable;
-import java.nio.charset.Charset;
-
-import com.alibaba.fescar.core.protocol.transaction.*;
+import com.alibaba.fescar.core.protocol.transaction.BranchCommitRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchCommitResponse;
+import com.alibaba.fescar.core.protocol.transaction.BranchRegisterRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchRegisterResponse;
+import com.alibaba.fescar.core.protocol.transaction.BranchReportRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchReportResponse;
+import com.alibaba.fescar.core.protocol.transaction.BranchRollbackRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchRollbackResponse;
 import com.alibaba.fescar.core.protocol.transaction.GlobalBeginRequest;
-
+import com.alibaba.fescar.core.protocol.transaction.GlobalBeginResponse;
+import com.alibaba.fescar.core.protocol.transaction.GlobalCommitRequest;
+import com.alibaba.fescar.core.protocol.transaction.GlobalCommitResponse;
+import com.alibaba.fescar.core.protocol.transaction.GlobalLockQueryRequest;
+import com.alibaba.fescar.core.protocol.transaction.GlobalLockQueryResponse;
+import com.alibaba.fescar.core.protocol.transaction.GlobalRollbackRequest;
+import com.alibaba.fescar.core.protocol.transaction.GlobalRollbackResponse;
+import com.alibaba.fescar.core.protocol.transaction.GlobalStatusRequest;
+import com.alibaba.fescar.core.protocol.transaction.GlobalStatusResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+
+import java.io.Serializable;
+import java.nio.charset.Charset;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -33,8 +48,6 @@ import io.netty.channel.ChannelHandlerContext;
  * @Description:
  */
 public abstract class AbstractMessage implements MessageCodec, Serializable {
-    private static final long serialVersionUID = -1441020418526899889L;
-
     public static final short TYPE_GLOBAL_BEGIN = 1;
     public static final short TYPE_GLOBAL_BEGIN_RESULT = 2;
     public static final short TYPE_GLOBAL_COMMIT = 7;
@@ -45,7 +58,6 @@ public abstract class AbstractMessage implements MessageCodec, Serializable {
     public static final short TYPE_GLOBAL_STATUS_RESULT = 16;
     public static final short TYPE_GLOBAL_LOCK_QUERY = 21;
     public static final short TYPE_GLOBAL_LOCK_QUERY_RESULT = 22;
-
     public static final short TYPE_BRANCH_COMMIT = 3;
     public static final short TYPE_BRANCH_COMMIT_RESULT = 4;
     public static final short TYPE_BRANCH_ROLLBACK = 5;
@@ -54,37 +66,30 @@ public abstract class AbstractMessage implements MessageCodec, Serializable {
     public static final short TYPE_BRANCH_REGISTER_RESULT = 12;
     public static final short TYPE_BRANCH_STATUS_REPORT = 13;
     public static final short TYPE_BRANCH_STATUS_REPORT_RESULT = 14;
-
     public static final short TYPE_FESCAR_MERGE = 59;
     public static final short TYPE_FESCAR_MERGE_RESULT = 60;
-
     public static final short TYPE_REG_CLT = 101;
     public static final short TYPE_REG_CLT_RESULT = 102;
     public static final short TYPE_REG_RM = 103;
     public static final short TYPE_REG_RM_RESULT = 104;
-
     protected static final Charset UTF8 = Charset.forName("utf-8");
+    private static final long serialVersionUID = -1441020418526899889L;
     protected ChannelHandlerContext ctx;
 
     public static int bytesToInt(byte[] bytes, int offset) {
         int ret = 0;
         for (int i = 0; i < 4 && i + offset < bytes.length; i++) {
             ret <<= 8;
-            ret |= (int)bytes[i + offset] & 0xFF;
+            ret |= (int) bytes[i + offset] & 0xFF;
         }
         return ret;
     }
 
     public static void intToBytes(int i, byte[] bytes, int offset) {
-        bytes[offset] = (byte)((i >> 24) & 0xFF);
-        bytes[offset + 1] = (byte)((i >> 16) & 0xFF);
-        bytes[offset + 2] = (byte)((i >> 8) & 0xFF);
-        bytes[offset + 3] = (byte)(i & 0xFF);
-    }
-
-    @Override
-    public boolean decode(ByteBuf in) {
-        return false;
+        bytes[offset] = (byte) ((i >> 24) & 0xFF);
+        bytes[offset + 1] = (byte) ((i >> 16) & 0xFF);
+        bytes[offset + 2] = (byte) ((i >> 8) & 0xFF);
+        bytes[offset + 3] = (byte) (i & 0xFF);
     }
 
     public static MessageCodec getMsgInstanceByCode(short typeCode) {
@@ -122,12 +127,13 @@ public abstract class AbstractMessage implements MessageCodec, Serializable {
             return msgCodec;
         } else {
             try {
-                msgCodec = (MessageCodec)getMergeRequestInstanceByCode(typeCode);
-            } catch (Exception exx) {}
+                msgCodec = (MessageCodec) getMergeRequestInstanceByCode(typeCode);
+            } catch (Exception exx) {
+            }
             if (null != msgCodec) {
                 return msgCodec;
             } else {
-                return (MessageCodec)getMergeResponseInstanceByCode(typeCode);
+                return (MessageCodec) getMergeResponseInstanceByCode(typeCode);
             }
         }
     }
@@ -176,5 +182,10 @@ public abstract class AbstractMessage implements MessageCodec, Serializable {
             default:
                 throw new RuntimeException("not support typeCode," + typeCode);
         }
+    }
+
+    @Override
+    public boolean decode(ByteBuf in) {
+        return false;
     }
 }

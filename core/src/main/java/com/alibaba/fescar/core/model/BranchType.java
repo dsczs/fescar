@@ -27,6 +27,7 @@ public enum BranchType {
     public static BranchType get(byte ordinal) {
         return get((int) ordinal);
     }
+
     public static BranchType get(int ordinal) {
         for (BranchType branchType : BranchType.values()) {
             if (branchType.ordinal() == ordinal) {

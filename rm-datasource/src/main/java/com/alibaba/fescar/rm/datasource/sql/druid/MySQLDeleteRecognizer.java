@@ -16,8 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.sql.druid;
 
-import java.util.ArrayList;
-
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
@@ -28,6 +26,8 @@ import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
 import com.alibaba.fescar.rm.datasource.ParametersHolder;
 import com.alibaba.fescar.rm.datasource.sql.SQLDeleteRecognizer;
 import com.alibaba.fescar.rm.datasource.sql.SQLType;
+
+import java.util.ArrayList;
 
 public class MySQLDeleteRecognizer extends BaseRecognizer implements SQLDeleteRecognizer {
 
@@ -47,7 +47,7 @@ public class MySQLDeleteRecognizer extends BaseRecognizer implements SQLDeleteRe
     public String getTableSource() {
         StringBuffer sb = new StringBuffer();
         MySqlOutputVisitor visitor = new MySqlOutputVisitor(sb);
-        visitor.visit((SQLExprTableSource)ast.getTableSource());
+        visitor.visit((SQLExprTableSource) ast.getTableSource());
         return sb.toString();
     }
 
@@ -62,7 +62,7 @@ public class MySQLDeleteRecognizer extends BaseRecognizer implements SQLDeleteRe
                 return false;
             }
         };
-        visitor.visit((SQLExprTableSource)ast.getTableSource());
+        visitor.visit((SQLExprTableSource) ast.getTableSource());
         return sb.toString();
     }
 

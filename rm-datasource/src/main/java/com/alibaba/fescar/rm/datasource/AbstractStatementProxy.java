@@ -16,14 +16,14 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.fescar.common.exception.NotSupportYetException;
+import com.alibaba.fescar.core.context.RootContext;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-
-import com.alibaba.fescar.common.exception.NotSupportYetException;
-import com.alibaba.fescar.core.context.RootContext;
 
 public abstract class AbstractStatementProxy<T extends Statement> implements Statement {
 
@@ -139,25 +139,25 @@ public abstract class AbstractStatementProxy<T extends Statement> implements Sta
     }
 
     @Override
+    public int getFetchDirection() throws SQLException {
+        return targetStatement.getFetchDirection();
+    }
+
+    @Override
     public void setFetchDirection(int direction) throws SQLException {
         targetStatement.setFetchDirection(direction);
 
     }
 
     @Override
-    public int getFetchDirection() throws SQLException {
-        return targetStatement.getFetchDirection();
+    public int getFetchSize() throws SQLException {
+        return targetStatement.getFetchSize();
     }
 
     @Override
     public void setFetchSize(int rows) throws SQLException {
         targetStatement.setFetchSize(rows);
 
-    }
-
-    @Override
-    public int getFetchSize() throws SQLException {
-        return targetStatement.getFetchSize();
     }
 
     @Override
@@ -216,14 +216,14 @@ public abstract class AbstractStatementProxy<T extends Statement> implements Sta
     }
 
     @Override
-    public void setPoolable(boolean poolable) throws SQLException {
-        targetStatement.setPoolable(poolable);
-
+    public boolean isPoolable() throws SQLException {
+        return targetStatement.isPoolable();
     }
 
     @Override
-    public boolean isPoolable() throws SQLException {
-        return targetStatement.isPoolable();
+    public void setPoolable(boolean poolable) throws SQLException {
+        targetStatement.setPoolable(poolable);
+
     }
 
     @Override

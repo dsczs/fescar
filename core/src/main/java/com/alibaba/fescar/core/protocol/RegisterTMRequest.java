@@ -49,8 +49,8 @@ public class RegisterTMRequest extends AbstractIdentifyRequest implements Serial
     @Override
     public String toString() {
         return "RegisterTMRequest{" +
-            "applicationId='" + applicationId + '\'' +
-            ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
-            '}';
+                "applicationId='" + applicationId + '\'' +
+                ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
+                '}';
     }
 }

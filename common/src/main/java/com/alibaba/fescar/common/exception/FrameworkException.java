@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.common.exception;
 
-import java.sql.SQLException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -64,10 +64,6 @@ public class FrameworkException extends RuntimeException {
         this(th, msg, FrameworkErrorCode.UnknownAppError);
     }
 
-    public FrameworkErrorCode getErrcode() {
-        return errcode;
-    }
-
     public static FrameworkException nestedException(Throwable e) {
         return nestedException("", e);
     }
@@ -75,7 +71,7 @@ public class FrameworkException extends RuntimeException {
     public static FrameworkException nestedException(String msg, Throwable e) {
         LOGGER.error(msg, e.getMessage(), e);
         if (e instanceof FrameworkException) {
-            return (FrameworkException)e;
+            return (FrameworkException) e;
         }
 
         return new FrameworkException(e, msg);
@@ -88,9 +84,13 @@ public class FrameworkException extends RuntimeException {
     public static SQLException nestedSQLException(String msg, Throwable e) {
         LOGGER.error(msg, e.getMessage(), e);
         if (e instanceof SQLException) {
-            return (SQLException)e;
+            return (SQLException) e;
         }
 
         return new SQLException(e);
+    }
+
+    public FrameworkErrorCode getErrcode() {
+        return errcode;
     }
 }

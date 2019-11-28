@@ -16,6 +16,8 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.fescar.rm.datasource.sql.struct.Null;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -38,19 +40,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.alibaba.fescar.rm.datasource.sql.struct.Null;
-
 public abstract class AbstractPreparedStatementProxy extends StatementProxy<PreparedStatement> implements PreparedStatement {
 
     protected ArrayList<Object>[] parameters;
-
-    private void initParameterHolder() throws SQLException {
-        int paramCount = targetStatement.getParameterMetaData().getParameterCount();
-        this.parameters = new ArrayList[paramCount];
-        for (int i = 0; i < paramCount; i++) {
-            parameters[i] = new ArrayList<>();
-        }
-    }
 
     public AbstractPreparedStatementProxy(AbstractConnectionProxy connectionProxy, PreparedStatement targetStatement, String targetSQL) throws SQLException {
         super(connectionProxy, targetStatement, targetSQL);
@@ -60,6 +52,14 @@ public abstract class AbstractPreparedStatementProxy extends StatementProxy<Prep
     public AbstractPreparedStatementProxy(AbstractConnectionProxy connectionProxy, PreparedStatement targetStatement) throws SQLException {
         super(connectionProxy, targetStatement);
         initParameterHolder();
+    }
+
+    private void initParameterHolder() throws SQLException {
+        int paramCount = targetStatement.getParameterMetaData().getParameterCount();
+        this.parameters = new ArrayList[paramCount];
+        for (int i = 0; i < paramCount; i++) {
+            parameters[i] = new ArrayList<>();
+        }
     }
 
     public List<Object> getParamsByIndex(int index) {

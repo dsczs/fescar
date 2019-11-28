@@ -28,7 +28,7 @@ public interface GlobalTransaction {
      * Begin a new global transaction with default timeout and name.
      *
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
-     * out.
+     *                              out.
      */
     void begin() throws TransactionException;
 
@@ -37,7 +37,7 @@ public interface GlobalTransaction {
      *
      * @param timeout Global transaction timeout in MILLISECONDS
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
-     * out.
+     *                              out.
      */
     void begin(int timeout) throws TransactionException;
 
@@ -47,7 +47,7 @@ public interface GlobalTransaction {
      * @param timeout Given timeout in MILLISECONDS.
      * @param name    Given name.
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
-     * out.
+     *                              out.
      */
     void begin(int timeout, String name) throws TransactionException;
 
@@ -55,7 +55,7 @@ public interface GlobalTransaction {
      * Commit the global transaction.
      *
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
-     * out.
+     *                              out.
      */
     void commit() throws TransactionException;
 
@@ -63,7 +63,7 @@ public interface GlobalTransaction {
      * Rollback the global transaction.
      *
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
-     * out.
+     *                              out.
      */
     void rollback() throws TransactionException;
 
@@ -72,7 +72,7 @@ public interface GlobalTransaction {
      *
      * @return Status of the corresponding global transaction.
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
-     * out.
+     *                              out.
      * @see GlobalStatus
      */
     GlobalStatus getStatus() throws TransactionException;

@@ -16,11 +16,11 @@
 
 package com.alibaba.fescar.core.protocol;
 
-import java.nio.ByteBuffer;
-
 import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MergeResultMessage extends AbstractMessage implements MergeMessage {
     private static final long serialVersionUID = -7719219648774528552L;
-    public AbstractResultMessage[] msgs;
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeResultMessage.class);
+    public AbstractResultMessage[] msgs;
 
     public AbstractResultMessage[] getMsgs() {
         return msgs;
@@ -50,7 +50,7 @@ public class MergeResultMessage extends AbstractMessage implements MergeMessage 
     @Override
     public byte[] encode() {
         ByteBuffer byteBuffer = ByteBuffer.allocate(msgs.length * 1024);
-        byteBuffer.putShort((short)msgs.length);
+        byteBuffer.putShort((short) msgs.length);
         for (AbstractMessage msg : msgs) {
             byte[] data = msg.encode();
             byteBuffer.putShort(msg.getTypeCode());
@@ -65,7 +65,7 @@ public class MergeResultMessage extends AbstractMessage implements MergeMessage 
         if (msgs.length > 20) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("msg in one fescar merge packet:" + msgs.length
-                    + ",buffer size:" + content.length);
+                        + ",buffer size:" + content.length);
             }
         }
         return content;
@@ -74,11 +74,15 @@ public class MergeResultMessage extends AbstractMessage implements MergeMessage 
     @Override
     public boolean decode(ByteBuf in) {
         int i = in.readableBytes();
-        if (i < 4) { return false; }
+        if (i < 4) {
+            return false;
+        }
 
         i -= 4;
         int length = in.readInt();
-        if (i < length) { return false; }
+        if (i < length) {
+            return false;
+        }
         byte[] buffer = new byte[length];
         in.readBytes(buffer);
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
@@ -93,14 +97,16 @@ public class MergeResultMessage extends AbstractMessage implements MergeMessage 
             short typeCode = byteBuffer.getShort();
             MergedMessage message = getMergeResponseInstanceByCode(typeCode);
             message.decode(byteBuffer);
-            msgs[idx] = (AbstractResultMessage)message;
+            msgs[idx] = (AbstractResultMessage) message;
         }
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("MergeResultMessage ");
-        for (AbstractMessage msg : msgs) { sb.append(msg.toString()).append("\n"); }
+        for (AbstractMessage msg : msgs) {
+            sb.append(msg.toString()).append("\n");
+        }
         return sb.toString();
     }
 }

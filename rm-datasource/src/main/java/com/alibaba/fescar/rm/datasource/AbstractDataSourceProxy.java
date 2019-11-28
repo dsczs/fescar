@@ -16,14 +16,13 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.druid.pool.DruidDataSource;
+
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
-import com.alibaba.druid.pool.DruidDataSource;
 
 public abstract class AbstractDataSourceProxy implements DataSource {
 
@@ -58,13 +57,13 @@ public abstract class AbstractDataSourceProxy implements DataSource {
     }
 
     @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
-        targetDataSource.setLoginTimeout(seconds);
+    public int getLoginTimeout() throws SQLException {
+        return targetDataSource.getLoginTimeout();
     }
 
     @Override
-    public int getLoginTimeout() throws SQLException {
-        return targetDataSource.getLoginTimeout();
+    public void setLoginTimeout(int seconds) throws SQLException {
+        targetDataSource.setLoginTimeout(seconds);
     }
 
     @Override

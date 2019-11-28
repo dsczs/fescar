@@ -16,6 +16,15 @@
 
 package com.alibaba.fescar.server.store;
 
+import com.alibaba.fescar.common.thread.NamedThreadFactory;
+import com.alibaba.fescar.core.model.GlobalStatus;
+import com.alibaba.fescar.server.session.BranchSession;
+import com.alibaba.fescar.server.session.GlobalSession;
+import com.alibaba.fescar.server.session.SessionCondition;
+import com.alibaba.fescar.server.session.SessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -32,27 +41,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.alibaba.fescar.common.thread.NamedThreadFactory;
-import com.alibaba.fescar.core.model.GlobalStatus;
-import com.alibaba.fescar.server.session.BranchSession;
-import com.alibaba.fescar.server.session.GlobalSession;
-import com.alibaba.fescar.server.session.SessionCondition;
-import com.alibaba.fescar.server.session.SessionManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The type File transaction store manager.
  */
 public class FileTransactionStoreManager implements TransactionStoreManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileTransactionStoreManager.class);
-    private BlockingQueue<TransactionWriteFuture> transactionWriteFutureQueue
-        = new LinkedBlockingQueue<TransactionWriteFuture>();
     private static final long MAX_ENQUEUE_MILLS = 5 * 1000;
     private static final int MAX_THREAD_WRITE = 1;
-    private ExecutorService fileWriteExecutor;
-    private volatile boolean stopping = false;
     private static final int MAX_SHUTDOWN_RETRY = 3;
     private static final int SHUTDOWN_CHECK_INTERNAL = 1 * 1000;
     private static final int MAX_WRITE_RETRY = 5;
@@ -63,15 +58,19 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
     private static final int MAX_POOL_TIME_MILLS = 2 * 1000;
     private static final int MAX_FLUSH_TIME_MILLS = 2 * 1000;
     private static final int MAX_FLUSH_NUM = 10;
+    private static final boolean ENABLE_SCHEDULE_FLUSH = true;
     private static int PER_FILE_BLOCK_SIZE = 65535 * 8;
     private static long MAX_TRX_TIMEOUT_MILLS = 30 * 60 * 1000;
     private static volatile long trxStartTimeMills = System.currentTimeMillis();
-    private static final boolean ENABLE_SCHEDULE_FLUSH = true;
+    private static long recoverCurrOffset = 0;
+    private static long recoverHisOffset = 0;
+    private BlockingQueue<TransactionWriteFuture> transactionWriteFutureQueue
+            = new LinkedBlockingQueue<TransactionWriteFuture>();
+    private ExecutorService fileWriteExecutor;
+    private volatile boolean stopping = false;
     private File currDataFile;
     private RandomAccessFile currRaf;
     private FileChannel currFileChannel;
-    private static long recoverCurrOffset = 0;
-    private static long recoverHisOffset = 0;
     private SessionManager sessionManager;
     private String currFullFileName;
     private String hisFullFileName;
@@ -85,8 +84,8 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
     public FileTransactionStoreManager(String fullFileName, SessionManager sessionManager) throws IOException {
         initFile(fullFileName);
         fileWriteExecutor = new ThreadPoolExecutor(MAX_THREAD_WRITE, MAX_THREAD_WRITE,
-            Integer.MAX_VALUE, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
-            new NamedThreadFactory("fileTransactionStore", MAX_THREAD_WRITE, true));
+                Integer.MAX_VALUE, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+                new NamedThreadFactory("fileTransactionStore", MAX_THREAD_WRITE, true));
         fileWriteExecutor.submit(new WriteDataFileRunnable());
         this.sessionManager = sessionManager;
     }
@@ -134,7 +133,8 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
                 ++retry;
                 try {
                     Thread.sleep(SHUTDOWN_CHECK_INTERNAL);
-                } catch (InterruptedException exx) {}
+                } catch (InterruptedException exx) {
+                }
             }
             if (retry >= MAX_SHUTDOWN_RETRY) {
                 fileWriteExecutor.shutdownNow();
@@ -197,13 +197,17 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
                 try {
                     buffSize.clear();
                     int avilReadSize = fileChannel.read(buffSize);
-                    if (avilReadSize != MARK_SIZE) { break; }
+                    if (avilReadSize != MARK_SIZE) {
+                        break;
+                    }
                     buffSize.flip();
                     int bodySize = buffSize.getInt();
                     byte[] byBody = new byte[bodySize];
                     ByteBuffer buffBody = ByteBuffer.wrap(byBody);
                     avilReadSize = fileChannel.read(buffBody);
-                    if (avilReadSize != bodySize) { break; }
+                    if (avilReadSize != bodySize) {
+                        break;
+                    }
                     TransactionWriteStore writeStore = new TransactionWriteStore();
                     writeStore.decode(byBody);
                     transactionWriteStores.add(writeStore);
@@ -262,8 +266,8 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
             while (!stopping) {
                 try {
                     TransactionWriteFuture transactionWriteFuture = transactionWriteFutureQueue.poll(
-                        MAX_POOL_TIME_MILLS,
-                        TimeUnit.MILLISECONDS);
+                            MAX_POOL_TIME_MILLS,
+                            TimeUnit.MILLISECONDS);
                     if (null == transactionWriteFuture) {
                         flushOnCondition();
                         continue;
@@ -280,7 +284,7 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
                         transactionWriteFuture.setResult(Boolean.FALSE);
                     }
                     if (FILE_TRX_NUM.get() % PER_FILE_BLOCK_SIZE == 0
-                        && (System.currentTimeMillis() - trxStartTimeMills) > MAX_TRX_TIMEOUT_MILLS) {
+                            && (System.currentTimeMillis() - trxStartTimeMills) > MAX_TRX_TIMEOUT_MILLS) {
                         saveHistory();
                     }
                 } catch (InterruptedException exx) {
@@ -314,11 +318,15 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
         }
 
         private void flushOnCondition() {
-            if (!ENABLE_SCHEDULE_FLUSH) { return; }
+            if (!ENABLE_SCHEDULE_FLUSH) {
+                return;
+            }
             long diff = FILE_TRX_NUM.get() - FILE_FLUSH_NUM.get();
-            if (diff == 0) { return; }
+            if (diff == 0) {
+                return;
+            }
             if (diff % MAX_FLUSH_NUM == 0
-                || System.currentTimeMillis() - currDataFile.lastModified() > MAX_FLUSH_TIME_MILLS) {
+                    || System.currentTimeMillis() - currDataFile.lastModified() > MAX_FLUSH_TIME_MILLS) {
                 try {
                     currFileChannel.force(false);
                 } catch (IOException exx) {
@@ -331,18 +339,18 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
         private void saveHistory() throws IOException {
             try {
                 List<GlobalSession> globalSessionsOverMaxTimeout = sessionManager.findGlobalSessions(
-                    new SessionCondition(
-                        GlobalStatus.Begin, MAX_TRX_TIMEOUT_MILLS));
+                        new SessionCondition(
+                                GlobalStatus.Begin, MAX_TRX_TIMEOUT_MILLS));
                 if (null != globalSessionsOverMaxTimeout) {
                     for (GlobalSession globalSession : globalSessionsOverMaxTimeout) {
                         TransactionWriteStore globalWriteStore = new TransactionWriteStore(globalSession,
-                            LogOperation.GLOBAL_ADD);
+                                LogOperation.GLOBAL_ADD);
                         writeDataFile(globalWriteStore.encode());
                         List<BranchSession> branchSessIonsOverMaXTimeout = globalSession.getSortedBranches();
                         if (null != branchSessIonsOverMaXTimeout) {
                             for (BranchSession branchSession : branchSessIonsOverMaXTimeout) {
                                 TransactionWriteStore branchWriteStore = new TransactionWriteStore(branchSession,
-                                    LogOperation.BRANCH_ADD);
+                                        LogOperation.BRANCH_ADD);
                                 writeDataFile(branchWriteStore.encode());
                             }
                         }
@@ -351,7 +359,7 @@ public class FileTransactionStoreManager implements TransactionStoreManager {
                 currFileChannel.force(true);
                 closeFile(currRaf);
                 Files.move(currDataFile.toPath(), new File(hisFullFileName).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+                        StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException exx) {
                 LOGGER.error("save history data file error," + exx.getMessage());
             } finally {

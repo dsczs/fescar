@@ -20,7 +20,6 @@ import com.alibaba.fescar.core.context.RootContext;
 import com.alibaba.fescar.rm.RMClientAT;
 import com.alibaba.fescar.test.common.ApplicationKeeper;
 import com.alibaba.fescar.tm.dubbo.StorageService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -38,20 +37,6 @@ public class StorageServiceImpl implements StorageService {
 
     private JdbcTemplate jdbcTemplate;
 
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Override
-    public void deduct(String commodityCode, int count) {
-        LOGGER.info("Storage Service Begin ... xid: " + RootContext.getXID());
-        LOGGER.info("Deducting inventory SQL: update storage_tbl set count = count - {} where commodity_code = {}",count,commodityCode);
-
-        jdbcTemplate.update("update storage_tbl set count = count - ? where commodity_code = ?", new Object[] {count, commodityCode});
-        LOGGER.info("Storage Service End ... ");
-
-    }
-
     public static void main(String[] args) throws Throwable {
 
         String applicationId = "dubbo-demo-storage-service";
@@ -65,5 +50,19 @@ public class StorageServiceImpl implements StorageService {
         jdbcTemplate.update("delete from storage_tbl where commodity_code = 'C00321'");
         jdbcTemplate.update("insert into storage_tbl(commodity_code, count) values ('C00321', 100)");
         new ApplicationKeeper(context).keep();
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void deduct(String commodityCode, int count) {
+        LOGGER.info("Storage Service Begin ... xid: " + RootContext.getXID());
+        LOGGER.info("Deducting inventory SQL: update storage_tbl set count = count - {} where commodity_code = {}", count, commodityCode);
+
+        jdbcTemplate.update("update storage_tbl set count = count - ? where commodity_code = ?", new Object[]{count, commodityCode});
+        LOGGER.info("Storage Service End ... ");
+
     }
 }

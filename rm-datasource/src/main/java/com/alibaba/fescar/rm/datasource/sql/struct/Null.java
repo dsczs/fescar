@@ -19,11 +19,11 @@ package com.alibaba.fescar.rm.datasource.sql.struct;
 public class Null {
     private static Null instance = new Null();
 
-    public static Null get() {
-        return instance;
+    private Null() {
     }
 
-    private Null() {
+    public static Null get() {
+        return instance;
     }
 
     @Override

@@ -25,11 +25,10 @@ import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.alibaba.dubbo.rpc.RpcException;
 import com.alibaba.fescar.core.context.RootContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Activate(group = { Constants.PROVIDER, Constants.CONSUMER }, order = 100)
+@Activate(group = {Constants.PROVIDER, Constants.CONSUMER}, order = 100)
 public class TransactionPropagationFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionPropagationFilter.class);

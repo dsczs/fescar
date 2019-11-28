@@ -16,10 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
-
 import com.alibaba.fescar.common.XID;
 import com.alibaba.fescar.common.exception.NotSupportYetException;
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
@@ -31,16 +27,39 @@ import com.alibaba.fescar.core.model.Resource;
 import com.alibaba.fescar.core.model.ResourceManager;
 import com.alibaba.fescar.core.model.ResourceManagerInbound;
 import com.alibaba.fescar.core.protocol.ResultCode;
-import com.alibaba.fescar.core.protocol.transaction.*;
 import com.alibaba.fescar.core.protocol.transaction.BranchRegisterRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchRegisterResponse;
+import com.alibaba.fescar.core.protocol.transaction.BranchReportRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchReportResponse;
+import com.alibaba.fescar.core.protocol.transaction.GlobalLockQueryRequest;
+import com.alibaba.fescar.core.protocol.transaction.GlobalLockQueryResponse;
 import com.alibaba.fescar.core.rpc.netty.RmRpcClient;
 import com.alibaba.fescar.rm.datasource.undo.UndoLogManager;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 public class DataSourceManager implements ResourceManager {
 
     private ResourceManagerInbound asyncWorker;
 
     private Map<String, Resource> dataSourceCache = new ConcurrentHashMap<>();
+
+    protected DataSourceManager() {
+    }
+
+    public static DataSourceManager get() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    public static void set(DataSourceManager mock) {
+        SingletonHolder.INSTANCE = mock;
+    }
+
+    public static synchronized void init(ResourceManagerInbound asyncWorker) {
+        get().setAsyncWorker(asyncWorker);
+    }
 
     public void setAsyncWorker(ResourceManagerInbound asyncWorker) {
         this.asyncWorker = asyncWorker;
@@ -108,25 +127,6 @@ public class DataSourceManager implements ResourceManager {
 
     }
 
-    private static class SingletonHolder {
-        private static DataSourceManager INSTANCE = new DataSourceManager();
-    }
-
-    public static DataSourceManager get() {
-        return SingletonHolder.INSTANCE;
-    }
-
-    public static void set(DataSourceManager mock) {
-        SingletonHolder.INSTANCE = mock;
-    }
-
-    public static synchronized void init(ResourceManagerInbound asyncWorker) {
-        get().setAsyncWorker(asyncWorker);
-    }
-
-    protected DataSourceManager() {
-    }
-
     @Override
     public void registerResource(Resource resource) {
         DataSourceProxy dataSourceProxy = (DataSourceProxy) resource;
@@ -171,5 +171,9 @@ public class DataSourceManager implements ResourceManager {
     @Override
     public Map<String, Resource> getManagedResources() {
         return dataSourceCache;
+    }
+
+    private static class SingletonHolder {
+        private static DataSourceManager INSTANCE = new DataSourceManager();
     }
 }

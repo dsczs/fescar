@@ -16,17 +16,12 @@
 
 package com.alibaba.fescar.tm.dubbo.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import com.alibaba.fescar.core.context.RootContext;
 import com.alibaba.fescar.rm.RMClientAT;
 import com.alibaba.fescar.test.common.ApplicationKeeper;
 import com.alibaba.fescar.tm.dubbo.AccountService;
 import com.alibaba.fescar.tm.dubbo.Order;
 import com.alibaba.fescar.tm.dubbo.OrderService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -34,6 +29,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Please add the follow VM arguments:
@@ -48,6 +47,19 @@ public class OrderServiceImpl implements OrderService {
     private AccountService accountService;
 
     private JdbcTemplate jdbcTemplate;
+
+    public static void main(String[] args) throws Throwable {
+
+        String applicationId = "dubbo-demo-order-service";
+        String txServiceGroup = "my_test_tx_group";
+
+        RMClientAT.init(applicationId, txServiceGroup);
+
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"dubbo-order-service.xml"});
+        context.getBean("service");
+        JdbcTemplate jdbcTemplate = (JdbcTemplate) context.getBean("jdbcTemplate");
+        new ApplicationKeeper(context).keep();
+    }
 
     @Override
     public Order create(String userId, String commodityCode, int orderCount) {
@@ -67,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        LOGGER.info("Order Service SQL: insert into order_tbl (user_id, commodity_code, count, money) values ({}, {}, {}, {})" ,userId ,commodityCode ,orderCount ,orderMoney );
+        LOGGER.info("Order Service SQL: insert into order_tbl (user_id, commodity_code, count, money) values ({}, {}, {}, {})", userId, commodityCode, orderCount, orderMoney);
 
         jdbcTemplate.update(new PreparedStatementCreator() {
 
@@ -84,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }, keyHolder);
 
-        order.id = (long)keyHolder.getKey();
+        order.id = (long) keyHolder.getKey();
 
         LOGGER.info("Order Service End ... Created " + order);
 
@@ -101,18 +113,5 @@ public class OrderServiceImpl implements OrderService {
 
     private int calculate(String commodityId, int orderCount) {
         return 200 * orderCount;
-    }
-
-    public static void main(String[] args) throws Throwable {
-
-        String applicationId = "dubbo-demo-order-service";
-        String txServiceGroup = "my_test_tx_group";
-
-        RMClientAT.init(applicationId, txServiceGroup);
-
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"dubbo-order-service.xml"});
-        context.getBean("service");
-        JdbcTemplate jdbcTemplate = (JdbcTemplate) context.getBean("jdbcTemplate");
-        new ApplicationKeeper(context).keep();
     }
 }

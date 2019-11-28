@@ -55,7 +55,7 @@ public enum FrameworkErrorCode {
     /**
      * 未定义错误
      */
-    UnknownAppError("10000","unknown error","内部错误"),
+    UnknownAppError("10000", "unknown error", "内部错误"),
     ;
 
     public String errCode;

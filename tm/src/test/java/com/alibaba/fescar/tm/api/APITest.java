@@ -17,7 +17,6 @@
 package com.alibaba.fescar.tm.api;
 
 import com.alibaba.fescar.core.context.RootContext;
-
 import org.junit.Assert;
 import org.junit.Test;
 

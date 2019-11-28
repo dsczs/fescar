@@ -16,18 +16,17 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.net.InetSocketAddress;
-
 import com.alibaba.fescar.common.exception.FrameworkException;
 import com.alibaba.fescar.common.util.NetUtil;
 import com.alibaba.fescar.core.protocol.RegisterRMResponse;
 import com.alibaba.fescar.core.protocol.RegisterTMResponse;
 import com.alibaba.fescar.core.rpc.netty.NettyPoolKey.TransactionRole;
-
 import io.netty.channel.Channel;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
 
 /**
  * The type Netty key poolable factory.
@@ -66,7 +65,7 @@ public class NettyPoolableFactory implements KeyedPoolableObjectFactory<NettyPoo
         Channel channelToServer = null;
         if (null == key.getMessage()) {
             throw new FrameworkException(
-                "register msg is null, role:" + key.getTransactionRole().name());
+                    "register msg is null, role:" + key.getTransactionRole().name());
         }
         try {
             response = rpcRemotingClient.sendAsyncRequestWithResponse(null, tmpChannel, key.getMessage());
@@ -75,36 +74,40 @@ public class NettyPoolableFactory implements KeyedPoolableObjectFactory<NettyPoo
             } else {
                 channelToServer = tmpChannel;
                 rpcRemotingClient.onRegisterMsgSuccess(key.getAddress(), tmpChannel, response,
-                    key.getMessage());
+                        key.getMessage());
             }
         } catch (Exception exx) {
-            if (tmpChannel != null) { tmpChannel.close(); }
+            if (tmpChannel != null) {
+                tmpChannel.close();
+            }
             throw new FrameworkException(
-                "register error,role:" + key.getTransactionRole().name() + ",err:" + exx.getMessage());
+                    "register error,role:" + key.getTransactionRole().name() + ",err:" + exx.getMessage());
         }
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(
-                "register success, cost " + (System.currentTimeMillis() - start) + " ms, version:"
-                    + getVersion(response, key.getTransactionRole()) + ",role:" + key.getTransactionRole().name()
-                    + ",channel:" + channelToServer);
+                    "register success, cost " + (System.currentTimeMillis() - start) + " ms, version:"
+                            + getVersion(response, key.getTransactionRole()) + ",role:" + key.getTransactionRole().name()
+                            + ",channel:" + channelToServer);
         }
         return channelToServer;
     }
 
     private boolean isResponseSuccess(Object response, TransactionRole transactionRole) {
-        if (null == response) { return false; }
+        if (null == response) {
+            return false;
+        }
         if (transactionRole.equals(TransactionRole.TMROLE)) {
             if (!(response instanceof RegisterTMResponse)) {
                 return false;
             }
-            if (((RegisterTMResponse)response).isIdentified()) {
+            if (((RegisterTMResponse) response).isIdentified()) {
                 return true;
             }
         } else if (transactionRole.equals(TransactionRole.RMROLE)) {
             if (!(response instanceof RegisterRMResponse)) {
                 return false;
             }
-            if (((RegisterRMResponse)response).isIdentified()) {
+            if (((RegisterRMResponse) response).isIdentified()) {
                 return true;
             }
         }
@@ -113,9 +116,9 @@ public class NettyPoolableFactory implements KeyedPoolableObjectFactory<NettyPoo
 
     private String getVersion(Object response, TransactionRole transactionRole) {
         if (transactionRole.equals(TransactionRole.TMROLE)) {
-            return ((RegisterTMResponse)response).getVersion();
+            return ((RegisterTMResponse) response).getVersion();
         } else {
-            return ((RegisterRMResponse)response).getVersion();
+            return ((RegisterRMResponse) response).getVersion();
         }
     }
 

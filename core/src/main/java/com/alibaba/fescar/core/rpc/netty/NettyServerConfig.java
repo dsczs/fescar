@@ -34,17 +34,24 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
  */
 public class NettyServerConfig extends NettyBaseConfig {
 
-    private int serverSelectorThreads = WORKER_THREAD_SIZE;
-    private int serverSocketSendBufSize = 153600;
-    private int serverSocketResvBufSize = 153600;
-    private int serverWorkerThreads = WORKER_THREAD_SIZE;
-    private int soBackLogSize = 1024;
-    private int writeBufferHighWaterMark = 67108864;
-    private int writeBufferLowWaterMark = 1048576;
+    /**
+     * The constant DIRECT_BYTE_BUF_ALLOCATOR.
+     */
+    public static final PooledByteBufAllocator DIRECT_BYTE_BUF_ALLOCATOR =
+            new PooledByteBufAllocator(
+                    true,
+                    WORKER_THREAD_SIZE,
+                    WORKER_THREAD_SIZE,
+                    2048 * 64,
+                    10,
+                    512,
+                    256,
+                    64,
+                    true,
+                    0
+            );
     private static final int DEFAULT_LISTEN_PORT = 8091;
     private static final int RPC_REQUEST_TIMEOUT = 30 * 1000;
-    private boolean enableServerPooledByteBufAllocator = true;
-    private int serverChannelMaxIdleTimeSeconds = 30;
     private static final Configuration CONFIG = ConfigurationFactory.getInstance();
     private static final String DEFAULT_BOSS_THREAD_PREFIX = "NettyBoss";
     private static final String EPOLL_WORKER_THREAD_PREFIX = "NettyServerEPollWorker";
@@ -55,23 +62,35 @@ public class NettyServerConfig extends NettyBaseConfig {
      * The Server channel clazz.
      */
     public final Class<? extends ServerChannel> SERVER_CHANNEL_CLAZZ = NettyBaseConfig.SERVER_CHANNEL_CLAZZ;
+    private int serverSelectorThreads = WORKER_THREAD_SIZE;
+    private int serverSocketSendBufSize = 153600;
+    private int serverSocketResvBufSize = 153600;
+    private int serverWorkerThreads = WORKER_THREAD_SIZE;
+    private int soBackLogSize = 1024;
+    private int writeBufferHighWaterMark = 67108864;
+    private int writeBufferLowWaterMark = 1048576;
+    private boolean enableServerPooledByteBufAllocator = true;
+    private int serverChannelMaxIdleTimeSeconds = 30;
 
     /**
-     * The constant DIRECT_BYTE_BUF_ALLOCATOR.
+     * Enable epoll boolean.
+     *
+     * @return the boolean
      */
-    public static final PooledByteBufAllocator DIRECT_BYTE_BUF_ALLOCATOR =
-        new PooledByteBufAllocator(
-            true,
-            WORKER_THREAD_SIZE,
-            WORKER_THREAD_SIZE,
-            2048 * 64,
-            10,
-            512,
-            256,
-            64,
-            true,
-            0
-        );
+    public static boolean enableEpoll() {
+        return NettyBaseConfig.SERVER_CHANNEL_CLAZZ.equals(EpollServerSocketChannel.class)
+                && Epoll.isAvailable();
+
+    }
+
+    /**
+     * Gets rpc request timeout.
+     *
+     * @return the rpc request timeout
+     */
+    public static int getRpcRequestTimeout() {
+        return RPC_REQUEST_TIMEOUT;
+    }
 
     /**
      * Gets server selector threads.
@@ -89,17 +108,6 @@ public class NettyServerConfig extends NettyBaseConfig {
      */
     public void setServerSelectorThreads(int serverSelectorThreads) {
         this.serverSelectorThreads = serverSelectorThreads;
-    }
-
-    /**
-     * Enable epoll boolean.
-     *
-     * @return the boolean
-     */
-    public static boolean enableEpoll() {
-        return NettyBaseConfig.SERVER_CHANNEL_CLAZZ.equals(EpollServerSocketChannel.class)
-            && Epoll.isAvailable();
-
     }
 
     /**
@@ -256,15 +264,6 @@ public class NettyServerConfig extends NettyBaseConfig {
     }
 
     /**
-     * Gets rpc request timeout.
-     *
-     * @return the rpc request timeout
-     */
-    public static int getRpcRequestTimeout() {
-        return RPC_REQUEST_TIMEOUT;
-    }
-
-    /**
      * Get boss thread prefix string.
      *
      * @return the string
@@ -280,7 +279,7 @@ public class NettyServerConfig extends NettyBaseConfig {
      */
     public String getWorkerThreadPrefix() {
         return CONFIG.getConfig("transport.thread-factory.worker-thread-prefix",
-            enableEpoll() ? EPOLL_WORKER_THREAD_PREFIX : NIO_WORKER_THREAD_PREFIX);
+                enableEpoll() ? EPOLL_WORKER_THREAD_PREFIX : NIO_WORKER_THREAD_PREFIX);
     }
 
     /**
@@ -290,7 +289,7 @@ public class NettyServerConfig extends NettyBaseConfig {
      */
     public String getExecutorThreadPrefix() {
         return CONFIG.getConfig("transport.thread-factory.server-executor-thread-prefix",
-            DEFAULT_EXECUTOR_THREAD_PREFIX);
+                DEFAULT_EXECUTOR_THREAD_PREFIX);
     }
 
     /**

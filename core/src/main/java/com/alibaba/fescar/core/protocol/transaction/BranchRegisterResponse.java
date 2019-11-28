@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.core.protocol.transaction;
 
+import com.alibaba.fescar.core.protocol.AbstractMessage;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-
-import com.alibaba.fescar.core.protocol.AbstractMessage;
 
 public class BranchRegisterResponse extends AbstractTransactionResponse implements Serializable {
 

@@ -16,12 +16,11 @@
 
 package com.alibaba.fescar.core.protocol;
 
+import com.alibaba.fescar.common.util.NetUtil;
+import io.netty.channel.Channel;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.alibaba.fescar.common.util.NetUtil;
-
-import io.netty.channel.Channel;
 
 public class Version {
 

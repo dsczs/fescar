@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.core.context;
 
+import com.alibaba.fescar.common.loader.LoadLevel;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.alibaba.fescar.common.loader.LoadLevel;
 
 @LoadLevel(name = "ThreadLocalContextCore", order = Integer.MIN_VALUE)
 public class ThreadLocalContextCore implements ContextCore {

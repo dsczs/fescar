@@ -16,6 +16,17 @@
 
 package com.alibaba.fescar.rm.datasource.undo;
 
+import com.alibaba.druid.util.JdbcConstants;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fescar.rm.datasource.sql.SQLType;
+import com.alibaba.fescar.rm.datasource.sql.struct.Field;
+import com.alibaba.fescar.rm.datasource.sql.struct.KeyType;
+import com.alibaba.fescar.rm.datasource.sql.struct.Row;
+import com.alibaba.fescar.rm.datasource.sql.struct.TableMeta;
+import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -48,18 +59,6 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
-
-import com.alibaba.druid.util.JdbcConstants;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fescar.rm.datasource.sql.SQLType;
-import com.alibaba.fescar.rm.datasource.sql.struct.Field;
-import com.alibaba.fescar.rm.datasource.sql.struct.KeyType;
-import com.alibaba.fescar.rm.datasource.sql.struct.Row;
-import com.alibaba.fescar.rm.datasource.sql.struct.TableMeta;
-import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
-
-import org.junit.Test;
 
 public class UndoExecutorTest {
 
@@ -680,23 +679,23 @@ public class UndoExecutorTest {
                 }
 
                 @Override
-                public void setFetchDirection(int direction) throws SQLException {
-
-                }
-
-                @Override
                 public int getFetchDirection() throws SQLException {
                     return 0;
                 }
 
                 @Override
-                public void setFetchSize(int rows) throws SQLException {
+                public void setFetchDirection(int direction) throws SQLException {
 
                 }
 
                 @Override
                 public int getFetchSize() throws SQLException {
                     return 0;
+                }
+
+                @Override
+                public void setFetchSize(int rows) throws SQLException {
+
                 }
 
                 @Override
@@ -780,13 +779,13 @@ public class UndoExecutorTest {
                 }
 
                 @Override
-                public void setPoolable(boolean poolable) throws SQLException {
-
+                public boolean isPoolable() throws SQLException {
+                    return false;
                 }
 
                 @Override
-                public boolean isPoolable() throws SQLException {
-                    return false;
+                public void setPoolable(boolean poolable) throws SQLException {
+
                 }
 
                 @Override
@@ -822,13 +821,13 @@ public class UndoExecutorTest {
         }
 
         @Override
-        public void setAutoCommit(boolean autoCommit) throws SQLException {
-
+        public boolean getAutoCommit() throws SQLException {
+            return false;
         }
 
         @Override
-        public boolean getAutoCommit() throws SQLException {
-            return false;
+        public void setAutoCommit(boolean autoCommit) throws SQLException {
+
         }
 
         @Override
@@ -857,17 +856,12 @@ public class UndoExecutorTest {
         }
 
         @Override
-        public void setReadOnly(boolean readOnly) throws SQLException {
-
-        }
-
-        @Override
         public boolean isReadOnly() throws SQLException {
             return false;
         }
 
         @Override
-        public void setCatalog(String catalog) throws SQLException {
+        public void setReadOnly(boolean readOnly) throws SQLException {
 
         }
 
@@ -877,13 +871,18 @@ public class UndoExecutorTest {
         }
 
         @Override
-        public void setTransactionIsolation(int level) throws SQLException {
+        public void setCatalog(String catalog) throws SQLException {
 
         }
 
         @Override
         public int getTransactionIsolation() throws SQLException {
             return 0;
+        }
+
+        @Override
+        public void setTransactionIsolation(int level) throws SQLException {
+
         }
 
         @Override
@@ -922,13 +921,13 @@ public class UndoExecutorTest {
         }
 
         @Override
-        public void setHoldability(int holdability) throws SQLException {
-
+        public int getHoldability() throws SQLException {
+            return 0;
         }
 
         @Override
-        public int getHoldability() throws SQLException {
-            return 0;
+        public void setHoldability(int holdability) throws SQLException {
+
         }
 
         @Override
@@ -1012,11 +1011,6 @@ public class UndoExecutorTest {
         }
 
         @Override
-        public void setClientInfo(Properties properties) throws SQLClientInfoException {
-
-        }
-
-        @Override
         public String getClientInfo(String name) throws SQLException {
             return null;
         }
@@ -1024,6 +1018,11 @@ public class UndoExecutorTest {
         @Override
         public Properties getClientInfo() throws SQLException {
             return null;
+        }
+
+        @Override
+        public void setClientInfo(Properties properties) throws SQLClientInfoException {
+
         }
 
         @Override
@@ -1037,13 +1036,13 @@ public class UndoExecutorTest {
         }
 
         @Override
-        public void setSchema(String schema) throws SQLException {
-
+        public String getSchema() throws SQLException {
+            return null;
         }
 
         @Override
-        public String getSchema() throws SQLException {
-            return null;
+        public void setSchema(String schema) throws SQLException {
+
         }
 
         @Override

@@ -16,8 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.sql;
 
-import java.util.List;
-
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
@@ -29,6 +27,8 @@ import com.alibaba.fescar.rm.datasource.sql.druid.MySQLDeleteRecognizer;
 import com.alibaba.fescar.rm.datasource.sql.druid.MySQLInsertRecognizer;
 import com.alibaba.fescar.rm.datasource.sql.druid.MySQLSelectForUpdateRecognizer;
 import com.alibaba.fescar.rm.datasource.sql.druid.MySQLUpdateRecognizer;
+
+import java.util.List;
 
 public class SQLVisitorFactory {
 

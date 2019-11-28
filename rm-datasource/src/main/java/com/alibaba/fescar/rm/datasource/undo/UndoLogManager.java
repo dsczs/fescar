@@ -16,12 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.undo;
 
-import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.alibaba.druid.util.JdbcConstants;
 import com.alibaba.fescar.common.exception.NotSupportYetException;
 import com.alibaba.fescar.common.util.BlobUtils;
@@ -32,9 +26,14 @@ import com.alibaba.fescar.rm.datasource.ConnectionProxy;
 import com.alibaba.fescar.rm.datasource.DataSourceProxy;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableMeta;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableMetaCache;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static com.alibaba.fescar.core.exception.TransactionExceptionCode.BranchRollbackFailed_Retriable;
 

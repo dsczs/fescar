@@ -30,7 +30,7 @@ import io.netty.util.concurrent.Future;
  * @FileName: ChannelAuthHealthChecker
  * @Description:
  */
-public interface ChannelAuthHealthChecker extends ChannelHealthChecker{
+public interface ChannelAuthHealthChecker extends ChannelHealthChecker {
     /**
      * The constant ACTIVE.
      */
@@ -38,7 +38,7 @@ public interface ChannelAuthHealthChecker extends ChannelHealthChecker{
         @Override
         public Future<Boolean> isHealthy(Channel channel) {
             EventLoop loop = channel.eventLoop();
-            return channel.isActive()? loop.newSucceededFuture(Boolean.TRUE) : loop.newSucceededFuture(Boolean.FALSE);
+            return channel.isActive() ? loop.newSucceededFuture(Boolean.TRUE) : loop.newSucceededFuture(Boolean.FALSE);
         }
     };
 }

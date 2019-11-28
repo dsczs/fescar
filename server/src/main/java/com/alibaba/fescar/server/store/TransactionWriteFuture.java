@@ -16,14 +16,13 @@
 
 package com.alibaba.fescar.server.store;
 
+import com.alibaba.fescar.server.store.TransactionStoreManager.LogOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.alibaba.fescar.server.store.TransactionStoreManager.LogOperation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type Transaction write future.
@@ -37,13 +36,13 @@ import org.slf4j.LoggerFactory;
 public class TransactionWriteFuture {
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionWriteFuture.class);
     private static final long DEFAULT_WRITE_TIMEOUT = 5 * 1000;
+    private static AtomicLong NEXT_WRITE_ID = new AtomicLong(0);
     private final long writeId;
+    private final TransactionWriteStore writeStore;
+    private final CountDownLatch latch = new CountDownLatch(1);
     private long timeoutMills;
     private long start = System.currentTimeMillis();
     private volatile Object result;
-    private final TransactionWriteStore writeStore;
-    private final CountDownLatch latch = new CountDownLatch(1);
-    private static AtomicLong NEXT_WRITE_ID = new AtomicLong(0);
 
     /**
      * Instantiates a new Transaction write future.
@@ -103,11 +102,11 @@ public class TransactionWriteFuture {
             return false;
         }
         if (result instanceof Exception) {
-            LOGGER.error("write file error,msg:" + ((Exception)result).getMessage());
+            LOGGER.error("write file error,msg:" + ((Exception) result).getMessage());
             return false;
         }
 
-        return (result instanceof Boolean) ? ((Boolean)result).booleanValue() : false;
+        return (result instanceof Boolean) ? ((Boolean) result).booleanValue() : false;
     }
 
     /**

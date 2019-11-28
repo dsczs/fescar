@@ -17,16 +17,13 @@
 package com.alibaba.fescar.core.context;
 
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RootContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RootContext.class);
-
     public static final String KEY_XID = "TX_XID";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RootContext.class);
     private static ContextCore CONTEXT_HOLDER = ContextCoreLoader.load();
 
     public static String getXID() {

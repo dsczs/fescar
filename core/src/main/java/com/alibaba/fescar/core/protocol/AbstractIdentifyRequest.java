@@ -16,22 +16,19 @@
 
 package com.alibaba.fescar.core.protocol;
 
-import java.nio.ByteBuffer;
-
 import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+
 public abstract class AbstractIdentifyRequest extends AbstractMessage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIdentifyRequest.class);
-
+    public ByteBuffer byteBuffer = ByteBuffer.allocate(10 * 1024);
     protected String version = Version.CURRENT;
-
     protected String applicationId;
-
     protected String transactionServiceGroup;
-
     protected String extraData;
 
     public AbstractIdentifyRequest(String applicationId, String transactionServiceGroup) {
@@ -77,48 +74,46 @@ public abstract class AbstractIdentifyRequest extends AbstractMessage {
         this.extraData = extraData;
     }
 
-    public ByteBuffer byteBuffer = ByteBuffer.allocate(10 * 1024);
-
     protected void doEncode() {
         byteBuffer.clear();
         if (this.version != null) {
             byte[] bs = version.getBytes(UTF8);
-            byteBuffer.putShort((short)bs.length);
+            byteBuffer.putShort((short) bs.length);
             if (bs.length > 0) {
                 byteBuffer.put(bs);
             }
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
 
         if (this.applicationId != null) {
             byte[] bs = applicationId.getBytes(UTF8);
-            byteBuffer.putShort((short)bs.length);
+            byteBuffer.putShort((short) bs.length);
             if (bs.length > 0) {
                 byteBuffer.put(bs);
             }
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
 
         if (this.transactionServiceGroup != null) {
             byte[] bs = transactionServiceGroup.getBytes(UTF8);
-            byteBuffer.putShort((short)bs.length);
+            byteBuffer.putShort((short) bs.length);
             if (bs.length > 0) {
                 byteBuffer.put(bs);
             }
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
 
         if (this.extraData != null) {
             byte[] bs = extraData.getBytes(UTF8);
-            byteBuffer.putShort((short)bs.length);
+            byteBuffer.putShort((short) bs.length);
             if (bs.length > 0) {
                 byteBuffer.put(bs);
             }
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
 
     }

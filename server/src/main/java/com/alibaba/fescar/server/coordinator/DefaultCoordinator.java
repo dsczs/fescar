@@ -16,12 +16,6 @@
 
 package com.alibaba.fescar.server.coordinator;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.alibaba.fescar.common.XID;
 import com.alibaba.fescar.common.thread.NamedThreadFactory;
 import com.alibaba.fescar.core.exception.TransactionException;
@@ -57,21 +51,34 @@ import com.alibaba.fescar.server.AbstractTCInboundHandler;
 import com.alibaba.fescar.server.session.BranchSession;
 import com.alibaba.fescar.server.session.GlobalSession;
 import com.alibaba.fescar.server.session.SessionHolder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.alibaba.fescar.core.exception.TransactionExceptionCode.FailedToSendBranchCommitRequest;
 import static com.alibaba.fescar.core.exception.TransactionExceptionCode.FailedToSendBranchRollbackRequest;
 
 public class DefaultCoordinator extends AbstractTCInboundHandler
-    implements TransactionMessageHandler, ResourceManagerInbound {
+        implements TransactionMessageHandler, ResourceManagerInbound {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCoordinator.class);
 
     private ServerMessageSender messageSender;
 
     private Core core = CoreFactory.get();
+    private ScheduledThreadPoolExecutor retryRollbacking = new ScheduledThreadPoolExecutor(1,
+            new NamedThreadFactory("RetryRollbacking", 1));
+    private ScheduledThreadPoolExecutor retryCommitting = new ScheduledThreadPoolExecutor(1,
+            new NamedThreadFactory("RetryCommitting", 1));
+    private ScheduledThreadPoolExecutor asyncCommitting = new ScheduledThreadPoolExecutor(1,
+            new NamedThreadFactory("AsyncCommitting", 1));
+    private ScheduledThreadPoolExecutor timeoutCheck = new ScheduledThreadPoolExecutor(1,
+            new NamedThreadFactory("TxTimeoutCheck", 1));
 
     public DefaultCoordinator(ServerMessageSender messageSender) {
         this.messageSender = messageSender;
@@ -80,14 +87,14 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
 
     @Override
     protected void doGlobalBegin(GlobalBeginRequest request, GlobalBeginResponse response, RpcContext rpcContext)
-        throws TransactionException {
+            throws TransactionException {
         response.setXid(core.begin(rpcContext.getApplicationId(), rpcContext.getTransactionServiceGroup(),
-            request.getTransactionName(), request.getTimeout()));
+                request.getTransactionName(), request.getTimeout()));
     }
 
     @Override
     protected void doGlobalCommit(GlobalCommitRequest request, GlobalCommitResponse response, RpcContext rpcContext)
-        throws TransactionException {
+            throws TransactionException {
         response.setGlobalStatus(core.commit(XID.generateXID(request.getTransactionId())));
 
     }
@@ -101,7 +108,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
 
     @Override
     protected void doGlobalStatus(GlobalStatusRequest request, GlobalStatusResponse response, RpcContext rpcContext)
-        throws TransactionException {
+            throws TransactionException {
         response.setGlobalStatus(core.getStatus(XID.generateXID(request.getTransactionId())));
     }
 
@@ -110,32 +117,32 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
                                     RpcContext rpcContext) throws TransactionException {
         response.setTransactionId(request.getTransactionId());
         response.setBranchId(
-            core.branchRegister(request.getBranchType(), request.getResourceId(), rpcContext.getClientId(),
-                XID.generateXID(request.getTransactionId()), request.getLockKey()));
+                core.branchRegister(request.getBranchType(), request.getResourceId(), rpcContext.getClientId(),
+                        XID.generateXID(request.getTransactionId()), request.getLockKey()));
 
     }
 
     @Override
     protected void doBranchReport(BranchReportRequest request, BranchReportResponse response, RpcContext rpcContext)
-        throws TransactionException {
+            throws TransactionException {
         core.branchReport(XID.generateXID(request.getTransactionId()), request.getBranchId(), request.getStatus(),
-            request.getApplicationData());
+                request.getApplicationData());
 
     }
 
     @Override
     protected void doLockCheck(GlobalLockQueryRequest request, GlobalLockQueryResponse response, RpcContext rpcContext)
-        throws TransactionException {
+            throws TransactionException {
         response.setLockable(core.lockQuery(request.getBranchType(), request.getResourceId(),
-            XID.generateXID(request.getTransactionId()), request.getLockKey()));
+                XID.generateXID(request.getTransactionId()), request.getLockKey()));
     }
 
     @Override
     public BranchStatus branchCommit(String xid, long branchId, String resourceId, String applicationData)
-        throws TransactionException {
+            throws TransactionException {
         try {
             BranchCommitRequest
-                request = new BranchCommitRequest();
+                    request = new BranchCommitRequest();
             request.setXid(xid);
             request.setBranchId(branchId);
             request.setResourceId(resourceId);
@@ -144,8 +151,8 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
             GlobalSession globalSession = SessionHolder.findGlobalSession(XID.getTransactionId(xid));
             BranchSession branchSession = globalSession.getBranch(branchId);
 
-            BranchCommitResponse response = (BranchCommitResponse)messageSender.sendSyncRequest(resourceId,
-                branchSession.getClientId(), request);
+            BranchCommitResponse response = (BranchCommitResponse) messageSender.sendSyncRequest(resourceId,
+                    branchSession.getClientId(), request);
             return response.getBranchStatus();
         } catch (IOException e) {
             throw new TransactionException(FailedToSendBranchCommitRequest, branchId + "/" + xid, e);
@@ -156,10 +163,10 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
 
     @Override
     public BranchStatus branchRollback(String xid, long branchId, String resourceId, String applicationData)
-        throws TransactionException {
+            throws TransactionException {
         try {
             BranchRollbackRequest
-                request = new BranchRollbackRequest();
+                    request = new BranchRollbackRequest();
             request.setXid(xid);
             request.setBranchId(branchId);
             request.setResourceId(resourceId);
@@ -168,8 +175,8 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
             GlobalSession globalSession = SessionHolder.findGlobalSession(XID.getTransactionId(xid));
             BranchSession branchSession = globalSession.getBranch(branchId);
 
-            BranchRollbackResponse response = (BranchRollbackResponse)messageSender.sendSyncRequest(resourceId,
-                branchSession.getClientId(), request);
+            BranchRollbackResponse response = (BranchRollbackResponse) messageSender.sendSyncRequest(resourceId,
+                    branchSession.getClientId(), request);
             return response.getBranchStatus();
         } catch (IOException e) {
             throw new TransactionException(FailedToSendBranchRollbackRequest, branchId + "/" + xid, e);
@@ -186,7 +193,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
         for (GlobalSession globalSession : allSessions) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(globalSession.getTransactionId() + " " + globalSession.getStatus() + " " +
-                    globalSession.getBeginTime() + " " + globalSession.getTimeout());
+                        globalSession.getBeginTime() + " " + globalSession.getTimeout());
             }
 
             if (globalSession.getStatus() != GlobalStatus.Begin || !globalSession.isTimeout()) {
@@ -196,7 +203,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
             globalSession.close();
             globalSession.changeStatus(GlobalStatus.TimeoutRollbacking);
             LOGGER.info(
-                "Global transaction[" + globalSession.getTransactionId() + "] is timeout and will be rolled back.");
+                    "Global transaction[" + globalSession.getTransactionId() + "] is timeout and will be rolled back.");
 
             globalSession.addSessionLifecycleListener(SessionHolder.getRetryRollbackingSessionManager());
             SessionHolder.getRetryRollbackingSessionManager().addGlobalSession(globalSession);
@@ -215,8 +222,8 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
                 core.doGlobalRollback(rollbackingSession, true);
             } catch (TransactionException ex) {
                 LOGGER.info(
-                    "Failed to retry rollbacking [" + rollbackingSession.getTransactionId() + "] " + ex.getCode() + " "
-                        + ex.getMessage());
+                        "Failed to retry rollbacking [" + rollbackingSession.getTransactionId() + "] " + ex.getCode() + " "
+                                + ex.getMessage());
             }
         }
     }
@@ -228,37 +235,25 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
                 core.doGlobalCommit(committingSession, true);
             } catch (TransactionException ex) {
                 LOGGER.info(
-                    "Failed to retry committing [" + committingSession.getTransactionId() + "] " + ex.getCode() + " "
-                        + ex.getMessage());
+                        "Failed to retry committing [" + committingSession.getTransactionId() + "] " + ex.getCode() + " "
+                                + ex.getMessage());
             }
         }
     }
 
     private void handleAsyncCommitting() {
         Collection<GlobalSession> asyncCommittingSessions = SessionHolder.getAsyncCommittingSessionManager()
-            .allSessions();
+                .allSessions();
         for (GlobalSession asyncCommittingSession : asyncCommittingSessions) {
             try {
                 core.doGlobalCommit(asyncCommittingSession, true);
             } catch (TransactionException ex) {
                 LOGGER.info(
-                    "Failed to async committing [" + asyncCommittingSession.getTransactionId() + "] " + ex.getCode()
-                        + " " + ex.getMessage());
+                        "Failed to async committing [" + asyncCommittingSession.getTransactionId() + "] " + ex.getCode()
+                                + " " + ex.getMessage());
             }
         }
     }
-
-    private ScheduledThreadPoolExecutor retryRollbacking = new ScheduledThreadPoolExecutor(1,
-        new NamedThreadFactory("RetryRollbacking", 1));
-
-    private ScheduledThreadPoolExecutor retryCommitting = new ScheduledThreadPoolExecutor(1,
-        new NamedThreadFactory("RetryCommitting", 1));
-
-    private ScheduledThreadPoolExecutor asyncCommitting = new ScheduledThreadPoolExecutor(1,
-        new NamedThreadFactory("AsyncCommitting", 1));
-
-    private ScheduledThreadPoolExecutor timeoutCheck = new ScheduledThreadPoolExecutor(1,
-        new NamedThreadFactory("TxTimeoutCheck", 1));
 
     public void init() {
         retryRollbacking.scheduleAtFixedRate(new Runnable() {
@@ -317,7 +312,7 @@ public class DefaultCoordinator extends AbstractTCInboundHandler
         if (!(request instanceof AbstractTransactionRequestToTC)) {
             throw new IllegalArgumentException();
         }
-        AbstractTransactionRequestToTC transactionRequest = (AbstractTransactionRequestToTC)request;
+        AbstractTransactionRequestToTC transactionRequest = (AbstractTransactionRequestToTC) request;
         transactionRequest.setTCInboundHandler(this);
 
         return transactionRequest.handle(context);

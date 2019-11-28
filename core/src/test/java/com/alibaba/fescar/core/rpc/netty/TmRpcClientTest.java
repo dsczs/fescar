@@ -16,11 +16,6 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import com.alibaba.fescar.common.Constants;
-import com.alibaba.fescar.config.Configuration;
-import com.alibaba.fescar.config.ConfigurationFactory;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**

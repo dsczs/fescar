@@ -16,8 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.sql.druid;
 
-import java.util.ArrayList;
-
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
@@ -32,6 +30,8 @@ import com.alibaba.fescar.rm.datasource.ParametersHolder;
 import com.alibaba.fescar.rm.datasource.sql.SQLParsingException;
 import com.alibaba.fescar.rm.datasource.sql.SQLSelectRecognizer;
 import com.alibaba.fescar.rm.datasource.sql.SQLType;
+
+import java.util.ArrayList;
 
 public class MySQLSelectForUpdateRecognizer extends BaseRecognizer implements SQLSelectRecognizer {
 
@@ -101,7 +101,7 @@ public class MySQLSelectForUpdateRecognizer extends BaseRecognizer implements SQ
         SQLTableSource tableSource = selectQueryBlock.getFrom();
         StringBuffer sb = new StringBuffer();
         MySqlOutputVisitor visitor = new MySqlOutputVisitor(sb);
-        visitor.visit((SQLExprTableSource)tableSource);
+        visitor.visit((SQLExprTableSource) tableSource);
         return sb.toString();
     }
 
@@ -118,7 +118,7 @@ public class MySQLSelectForUpdateRecognizer extends BaseRecognizer implements SQ
                 return false;
             }
         };
-        visitor.visit((SQLExprTableSource)tableSource);
+        visitor.visit((SQLExprTableSource) tableSource);
         return sb.toString();
     }
 

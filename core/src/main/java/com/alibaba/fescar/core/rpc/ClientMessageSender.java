@@ -35,7 +35,7 @@ public interface ClientMessageSender {
      * @param msg     the msg
      * @param timeout the timeout
      * @return the object
-     * @throws IOException the io exception
+     * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
     Object sendMsgWithResponse(Object msg, long timeout) throws TimeoutException;
@@ -47,7 +47,7 @@ public interface ClientMessageSender {
      * @param msg           the msg
      * @param timeout       the timeout
      * @return the object
-     * @throws IOException the io exception
+     * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
     Object sendMsgWithResponse(String serverAddress, Object msg, long timeout) throws TimeoutException;
@@ -57,7 +57,7 @@ public interface ClientMessageSender {
      *
      * @param msg the msg
      * @return the object
-     * @throws IOException the io exception
+     * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
     Object sendMsgWithResponse(Object msg) throws TimeoutException;

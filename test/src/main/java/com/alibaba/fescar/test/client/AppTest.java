@@ -21,7 +21,6 @@ import com.alibaba.fescar.test.common.ApplicationKeeper;
 import com.alibaba.fescar.tm.TMClient;
 import com.alibaba.fescar.tm.api.TransactionalExecutor;
 import com.alibaba.fescar.tm.api.TransactionalTemplate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -79,7 +78,7 @@ public class AppTest {
                 @Override
                 public Object execute() throws Throwable {
                     LOGGER.info("Exception Rollback Business Begin ...");
-                    jdbcTemplate.update("update user0 set name = 'xxx' where id = ?", new Object[] {1});
+                    jdbcTemplate.update("update user0 set name = 'xxx' where id = ?", new Object[]{1});
 //                    jdbcTemplate.update("insert into user0 (id, name, gmt) values (?, ?, now())", new Object[] {2, "abc"});
 //                    jdbcTemplate.update("insert into user1 (name, gmt) values (?, now())", new Object[] {"abc"});
 //                    jdbcTemplate.update(new PreparedStatementCreator() {
@@ -147,15 +146,15 @@ public class AppTest {
 
         private String businessErrorCode;
 
+        public MyBusinessException(String businessErrorCode) {
+            this.businessErrorCode = businessErrorCode;
+        }
+
         public String getBusinessErrorCode() {
             return businessErrorCode;
         }
 
         public void setBusinessErrorCode(String businessErrorCode) {
-            this.businessErrorCode = businessErrorCode;
-        }
-
-        public MyBusinessException(String businessErrorCode) {
             this.businessErrorCode = businessErrorCode;
         }
     }

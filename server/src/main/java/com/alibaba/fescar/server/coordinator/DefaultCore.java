@@ -29,11 +29,14 @@ import com.alibaba.fescar.server.lock.LockManagerFactory;
 import com.alibaba.fescar.server.session.BranchSession;
 import com.alibaba.fescar.server.session.GlobalSession;
 import com.alibaba.fescar.server.session.SessionHolder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.alibaba.fescar.core.exception.TransactionExceptionCode.*;
+import static com.alibaba.fescar.core.exception.TransactionExceptionCode.BranchTransactionNotExist;
+import static com.alibaba.fescar.core.exception.TransactionExceptionCode.FailedToAddBranch;
+import static com.alibaba.fescar.core.exception.TransactionExceptionCode.GlobalTransactionNotActive;
+import static com.alibaba.fescar.core.exception.TransactionExceptionCode.GlobalTransactionStatusInvalid;
+import static com.alibaba.fescar.core.exception.TransactionExceptionCode.LockKeyConflict;
 
 public class DefaultCore implements Core {
 

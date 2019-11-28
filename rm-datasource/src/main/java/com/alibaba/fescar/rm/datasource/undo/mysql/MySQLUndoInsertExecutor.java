@@ -16,11 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.undo.mysql;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 import com.alibaba.fescar.rm.datasource.sql.struct.Field;
 import com.alibaba.fescar.rm.datasource.sql.struct.KeyType;
@@ -29,7 +24,16 @@ import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
 import com.alibaba.fescar.rm.datasource.undo.AbstractUndoExecutor;
 import com.alibaba.fescar.rm.datasource.undo.SQLUndoLog;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MySQLUndoInsertExecutor extends AbstractUndoExecutor {
+
+    public MySQLUndoInsertExecutor(SQLUndoLog sqlUndoLog) {
+        super(sqlUndoLog);
+    }
 
     @Override
     protected String buildUndoSQL() {
@@ -54,10 +58,6 @@ public class MySQLUndoInsertExecutor extends AbstractUndoExecutor {
     @Override
     protected void undoPrepare(PreparedStatement undoPST, ArrayList<Field> undoValues, Field pkValue) throws SQLException {
         undoPST.setObject(1, pkValue.getValue(), pkValue.getType());
-    }
-
-    public MySQLUndoInsertExecutor(SQLUndoLog sqlUndoLog) {
-        super(sqlUndoLog);
     }
 
     @Override

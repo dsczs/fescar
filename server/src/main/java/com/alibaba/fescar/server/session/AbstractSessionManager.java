@@ -16,20 +16,19 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.alibaba.fescar.core.exception.TransactionException;
 import com.alibaba.fescar.core.model.BranchStatus;
 import com.alibaba.fescar.core.model.GlobalStatus;
 import com.alibaba.fescar.server.store.TransactionStoreManager;
 import com.alibaba.fescar.server.store.TransactionStoreManager.LogOperation;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractSessionManager implements SessionManager, SessionLifecycleListener {
 

@@ -16,9 +16,9 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.io.IOException;
-
 import com.alibaba.fescar.server.store.FileTransactionStoreManager;
+
+import java.io.IOException;
 
 public class FileBasedSessionManager extends AbstractSessionManager {
 

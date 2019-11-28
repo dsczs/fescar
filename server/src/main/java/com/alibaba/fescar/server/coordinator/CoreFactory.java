@@ -18,10 +18,6 @@ package com.alibaba.fescar.server.coordinator;
 
 public class CoreFactory {
 
-    private static class SingletonHolder {
-        private static Core INSTANCE = new DefaultCore();
-    }
-
     public static final Core get() {
         return CoreFactory.SingletonHolder.INSTANCE;
     }
@@ -31,5 +27,9 @@ public class CoreFactory {
      */
     public static void set(Core core) {
         CoreFactory.SingletonHolder.INSTANCE = core;
+    }
+
+    private static class SingletonHolder {
+        private static Core INSTANCE = new DefaultCore();
     }
 }

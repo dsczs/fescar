@@ -16,25 +16,25 @@
 
 package com.alibaba.fescar.rm.datasource.undo;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import com.alibaba.fescar.rm.datasource.sql.struct.Field;
 import com.alibaba.fescar.rm.datasource.sql.struct.KeyType;
 import com.alibaba.fescar.rm.datasource.sql.struct.Row;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 public abstract class AbstractUndoExecutor {
 
     protected SQLUndoLog sqlUndoLog;
 
-    protected abstract String buildUndoSQL();
-
     public AbstractUndoExecutor(SQLUndoLog sqlUndoLog) {
         this.sqlUndoLog = sqlUndoLog;
     }
+
+    protected abstract String buildUndoSQL();
 
     public void executeOn(Connection conn) throws SQLException {
         dataValidation(conn);

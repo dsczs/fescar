@@ -19,7 +19,6 @@ package com.alibaba.fescar.core.rpc.netty;
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 import com.alibaba.fescar.config.Configuration;
 import com.alibaba.fescar.config.ConfigurationFactory;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.EpollDomainSocketChannel;
@@ -48,8 +47,6 @@ import org.slf4j.LoggerFactory;
  * @Description:
  */
 public class NettyBaseConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NettyBaseConfig.class);
-
     /**
      * The constant CONFIG.
      */
@@ -58,28 +55,19 @@ public class NettyBaseConfig {
      * The constant BOSS_THREAD_PREFIX.
      */
     protected static final String BOSS_THREAD_PREFIX = CONFIG.getConfig("transport.thread-factory.boss-thread-prefix");
-
     /**
      * The constant WORKER_THREAD_PREFIX.
      */
     protected static final String WORKER_THREAD_PREFIX = CONFIG.getConfig(
-        "transport.thread-factory.worker-thread-prefix");
-
+            "transport.thread-factory.worker-thread-prefix");
     /**
      * The constant SHARE_BOSS_WORKER.
      */
     protected static final boolean SHARE_BOSS_WORKER = CONFIG.getBoolean("transport.thread-factory.share-boss-worker");
-
-    /**
-     * The constant WORKER_THREAD_SIZE.
-     */
-    protected static int WORKER_THREAD_SIZE;
-
     /**
      * The constant TRANSPORT_SERVER_TYPE.
      */
     protected static final TransportServerType TRANSPORT_SERVER_TYPE;
-
     /**
      * The constant SERVER_CHANNEL_CLAZZ.
      */
@@ -88,21 +76,20 @@ public class NettyBaseConfig {
      * The constant CLIENT_CHANNEL_CLAZZ.
      */
     protected static final Class<? extends Channel> CLIENT_CHANNEL_CLAZZ;
-
     /**
      * The constant TRANSPORT_PROTOCOL_TYPE.
      */
     protected static final TransportProtocolType TRANSPORT_PROTOCOL_TYPE;
-
-    private static final int DEFAULT_WRITE_IDLE_SECONDS = 5;
-
-    private static final int READIDLE_BASE_WRITEIDLE = 3;
-
     protected static final int MAX_WRITE_IDLE_SECONDS;
-
     protected static final int MAX_READ_IDLE_SECONDS;
-
     protected static final int MAX_ALL_IDLE_SECONDS = 0;
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyBaseConfig.class);
+    private static final int DEFAULT_WRITE_IDLE_SECONDS = 5;
+    private static final int READIDLE_BASE_WRITEIDLE = 3;
+    /**
+     * The constant WORKER_THREAD_SIZE.
+     */
+    protected static int WORKER_THREAD_SIZE;
 
     static {
         TRANSPORT_PROTOCOL_TYPE = TransportProtocolType.valueOf(CONFIG.getConfig("transport.type"));
@@ -169,7 +156,7 @@ public class NettyBaseConfig {
 
     private static void raiseUnsupportedTransportError() throws RuntimeException {
         String errMsg = String.format("Unsupported provider type :[%s] for transport:[%s].", TRANSPORT_SERVER_TYPE,
-            TRANSPORT_PROTOCOL_TYPE);
+                TRANSPORT_PROTOCOL_TYPE);
         LOGGER.error(errMsg);
         throw new IllegalArgumentException(errMsg);
     }
@@ -196,15 +183,6 @@ public class NettyBaseConfig {
          */
         Default(NettyRuntime.availableProcessors() * 2);
 
-        /**
-         * Gets value.
-         *
-         * @return the value
-         */
-        public int getValue() {
-            return value;
-        }
-
         private int value;
 
         WorkThreadMode(int value) {
@@ -229,6 +207,15 @@ public class NettyBaseConfig {
             } else {
                 throw new ShouldNeverHappenException("incorrect workThreadMode.");
             }
+        }
+
+        /**
+         * Gets value.
+         *
+         * @return the value
+         */
+        public int getValue() {
+            return value;
         }
 
     }

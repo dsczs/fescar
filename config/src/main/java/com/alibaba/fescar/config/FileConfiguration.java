@@ -16,18 +16,17 @@
 
 package com.alibaba.fescar.config;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fescar.common.thread.NamedThreadFactory;
 import com.alibaba.fescar.config.ConfigFuture.ConfigOperation;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The type FileConfiguration.
@@ -43,22 +42,18 @@ public class FileConfiguration implements Configuration {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileConfiguration.class);
 
     private static final Config CONFIG = ConfigFactory.load();
-
-    private ExecutorService configOperateExecutor;
-
     private static final int CORE_CONFIG_OPERATE_THREAD = 1;
-
     private static final int MAX_CONFIG_OPERATE_THREAD = 2;
-
     private static final long DEFAULT_CONFIG_TIMEOUT = 5 * 1000;
+    private ExecutorService configOperateExecutor;
 
     /**
      * Instantiates a new File configuration.
      */
     public FileConfiguration() {
         configOperateExecutor = new ThreadPoolExecutor(CORE_CONFIG_OPERATE_THREAD, MAX_CONFIG_OPERATE_THREAD,
-            Integer.MAX_VALUE, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
-            new NamedThreadFactory("configOperate", MAX_CONFIG_OPERATE_THREAD, true));
+                Integer.MAX_VALUE, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+                new NamedThreadFactory("configOperate", MAX_CONFIG_OPERATE_THREAD, true));
     }
 
     @Override
@@ -113,7 +108,7 @@ public class FileConfiguration implements Configuration {
     public String getConfig(String dataId, String defaultValue, long timeoutMills) {
         ConfigFuture configFuture = new ConfigFuture(dataId, defaultValue, ConfigOperation.GET, timeoutMills);
         configOperateExecutor.submit(new ConfigOperateRunnable(configFuture));
-        return (String)configFuture.get();
+        return (String) configFuture.get();
     }
 
     @Override
@@ -135,7 +130,7 @@ public class FileConfiguration implements Configuration {
     public boolean putConfig(String dataId, String content, long timeoutMills) {
         ConfigFuture configFuture = new ConfigFuture(dataId, content, ConfigOperation.PUT, timeoutMills);
         configOperateExecutor.submit(new ConfigOperateRunnable(configFuture));
-        return (Boolean)configFuture.get();
+        return (Boolean) configFuture.get();
     }
 
     @Override
@@ -147,7 +142,7 @@ public class FileConfiguration implements Configuration {
     public boolean putConfigIfAbsent(String dataId, String content, long timeoutMills) {
         ConfigFuture configFuture = new ConfigFuture(dataId, content, ConfigOperation.PUTIFABSENT, timeoutMills);
         configOperateExecutor.submit(new ConfigOperateRunnable(configFuture));
-        return (Boolean)configFuture.get();
+        return (Boolean) configFuture.get();
     }
 
     @Override
@@ -159,7 +154,7 @@ public class FileConfiguration implements Configuration {
     public boolean removeConfig(String dataId, long timeoutMills) {
         ConfigFuture configFuture = new ConfigFuture(dataId, null, ConfigOperation.REMOVE, timeoutMills);
         configOperateExecutor.submit(new ConfigOperateRunnable(configFuture));
-        return (Boolean)configFuture.get();
+        return (Boolean) configFuture.get();
     }
 
     @Override

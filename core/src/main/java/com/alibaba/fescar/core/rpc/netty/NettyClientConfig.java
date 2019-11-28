@@ -24,20 +24,8 @@ import io.netty.channel.Channel;
  */
 public class NettyClientConfig extends NettyBaseConfig {
 
-    private int connectTimeoutMillis = 10000;
-    private int clientSocketSndBufSize = 153600;
-    private int clientSocketRcvBufSize = 153600;
-    private int clientWorkerThreads = WORKER_THREAD_SIZE;
-    private final Class<? extends Channel> clientChannelClazz = CLIENT_CHANNEL_CLAZZ;
-    private int perHostMaxConn = 2;
     private static final int PER_HOST_MIN_CONN = 2;
-    private int pendingConnSize = Integer.MAX_VALUE;
     private static final int RPC_REQUEST_TIMEOUT = 30 * 1000;
-    private final boolean useConnPool = false;
-    private static String vgroup;
-    private static String clientAppName;
-    private static int clientType;
-    private static int maxInactiveChannelCheck = 10;
     private static final int MAX_NOT_WRITEABLE_RETRY = 2000;
     private static final int MAX_CHECK_ALIVE_RETRY = 300;
     private static final int CHECK_ALIVE_INTERNAL = 10;
@@ -52,6 +40,135 @@ public class NettyClientConfig extends NettyBaseConfig {
     private static final boolean DEFAULT_POOL_TEST_BORROW = true;
     private static final boolean DEFAULT_POOL_TEST_RETURN = true;
     private static final boolean DEFAULT_POOL_FIFO = true;
+    private static String vgroup;
+    private static String clientAppName;
+    private static int clientType;
+    private static int maxInactiveChannelCheck = 10;
+    private final Class<? extends Channel> clientChannelClazz = CLIENT_CHANNEL_CLAZZ;
+    private final boolean useConnPool = false;
+    private int connectTimeoutMillis = 10000;
+    private int clientSocketSndBufSize = 153600;
+    private int clientSocketRcvBufSize = 153600;
+    private int clientWorkerThreads = WORKER_THREAD_SIZE;
+    private int perHostMaxConn = 2;
+    private int pendingConnSize = Integer.MAX_VALUE;
+
+    /**
+     * Gets rpc sendAsyncRequestWithResponse time out.
+     *
+     * @return the rpc sendAsyncRequestWithResponse time out
+     */
+    public static int getRpcRequestTimeout() {
+        return RPC_REQUEST_TIMEOUT;
+    }
+
+    /**
+     * Gets vgroup.
+     *
+     * @return the vgroup
+     */
+    public static String getVgroup() {
+        return vgroup;
+    }
+
+    /**
+     * Sets vgroup.
+     *
+     * @param vgroup the vgroup
+     */
+    public static void setVgroup(String vgroup) {
+        NettyClientConfig.vgroup = vgroup;
+    }
+
+    /**
+     * Gets client app name.
+     *
+     * @return the client app name
+     */
+    public static String getClientAppName() {
+        return clientAppName;
+    }
+
+    /**
+     * Sets client app name.
+     *
+     * @param clientAppName the client app name
+     */
+    public static void setClientAppName(String clientAppName) {
+        NettyClientConfig.clientAppName = clientAppName;
+    }
+
+    /**
+     * Gets client type.
+     *
+     * @return the client type
+     */
+    public static int getClientType() {
+        return clientType;
+    }
+
+    /**
+     * Sets client type.
+     *
+     * @param clientType the client type
+     */
+    public static void setClientType(int clientType) {
+        NettyClientConfig.clientType = clientType;
+    }
+
+    /**
+     * Gets max inactive channel check.
+     *
+     * @return the max inactive channel check
+     */
+    public static int getMaxInactiveChannelCheck() {
+        return maxInactiveChannelCheck;
+    }
+
+    /**
+     * Gets max not writeable retry.
+     *
+     * @return the max not writeable retry
+     */
+    public static int getMaxNotWriteableRetry() {
+        return MAX_NOT_WRITEABLE_RETRY;
+    }
+
+    /**
+     * Gets per host min conn.
+     *
+     * @return the per host min conn
+     */
+    public static int getPerHostMinConn() {
+        return PER_HOST_MIN_CONN;
+    }
+
+    /**
+     * Gets max check alive retry.
+     *
+     * @return the max check alive retry
+     */
+    public static int getMaxCheckAliveRetry() {
+        return MAX_CHECK_ALIVE_RETRY;
+    }
+
+    /**
+     * Gets check alive internal.
+     *
+     * @return the check alive internal
+     */
+    public static int getCheckAliveInternal() {
+        return CHECK_ALIVE_INTERNAL;
+    }
+
+    /**
+     * Gets socket address start char.
+     *
+     * @return the socket address start char
+     */
+    public static String getSocketAddressStartChar() {
+        return SOCKET_ADDRESS_START_CHAR;
+    }
 
     /**
      * Gets connect timeout millis.
@@ -211,129 +328,12 @@ public class NettyClientConfig extends NettyBaseConfig {
     }
 
     /**
-     * Gets rpc sendAsyncRequestWithResponse time out.
-     *
-     * @return the rpc sendAsyncRequestWithResponse time out
-     */
-    public static int getRpcRequestTimeout() {
-        return RPC_REQUEST_TIMEOUT;
-    }
-
-    /**
      * Is use conn pool boolean.
      *
      * @return the boolean
      */
     public boolean isUseConnPool() {
         return useConnPool;
-    }
-
-    /**
-     * Gets vgroup.
-     *
-     * @return the vgroup
-     */
-    public static String getVgroup() {
-        return vgroup;
-    }
-
-    /**
-     * Sets vgroup.
-     *
-     * @param vgroup the vgroup
-     */
-    public static void setVgroup(String vgroup) {
-        NettyClientConfig.vgroup = vgroup;
-    }
-
-    /**
-     * Gets client app name.
-     *
-     * @return the client app name
-     */
-    public static String getClientAppName() {
-        return clientAppName;
-    }
-
-    /**
-     * Sets client app name.
-     *
-     * @param clientAppName the client app name
-     */
-    public static void setClientAppName(String clientAppName) {
-        NettyClientConfig.clientAppName = clientAppName;
-    }
-
-    /**
-     * Gets client type.
-     *
-     * @return the client type
-     */
-    public static int getClientType() {
-        return clientType;
-    }
-
-    /**
-     * Sets client type.
-     *
-     * @param clientType the client type
-     */
-    public static void setClientType(int clientType) {
-        NettyClientConfig.clientType = clientType;
-    }
-
-    /**
-     * Gets max inactive channel check.
-     *
-     * @return the max inactive channel check
-     */
-    public static int getMaxInactiveChannelCheck() {
-        return maxInactiveChannelCheck;
-    }
-
-    /**
-     * Gets max not writeable retry.
-     *
-     * @return the max not writeable retry
-     */
-    public static int getMaxNotWriteableRetry() {
-        return MAX_NOT_WRITEABLE_RETRY;
-    }
-
-    /**
-     * Gets per host min conn.
-     *
-     * @return the per host min conn
-     */
-    public static int getPerHostMinConn() {
-        return PER_HOST_MIN_CONN;
-    }
-
-    /**
-     * Gets max check alive retry.
-     *
-     * @return the max check alive retry
-     */
-    public static int getMaxCheckAliveRetry() {
-        return MAX_CHECK_ALIVE_RETRY;
-    }
-
-    /**
-     * Gets check alive internal.
-     *
-     * @return the check alive internal
-     */
-    public static int getCheckAliveInternal() {
-        return CHECK_ALIVE_INTERNAL;
-    }
-
-    /**
-     * Gets socket address start char.
-     *
-     * @return the socket address start char
-     */
-    public static String getSocketAddressStartChar() {
-        return SOCKET_ADDRESS_START_CHAR;
     }
 
     /**
@@ -361,7 +361,7 @@ public class NettyClientConfig extends NettyBaseConfig {
      */
     public String getClientSelectorThreadPrefix() {
         return CONFIG.getConfig("transport.thread-factory.client-selector-thread-prefix",
-            DEFAULT_SELECTOR_THREAD_PREFIX);
+                DEFAULT_SELECTOR_THREAD_PREFIX);
     }
 
     /**

@@ -16,17 +16,17 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.alibaba.fescar.core.exception.TransactionException;
 import com.alibaba.fescar.core.model.BranchStatus;
 import com.alibaba.fescar.core.model.BranchType;
 import com.alibaba.fescar.server.lock.LockManagerFactory;
 import com.alibaba.fescar.server.store.SessionStorable;
+
+import java.nio.ByteBuffer;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BranchSession implements Lockable, Comparable<BranchSession>, SessionStorable {
 
@@ -208,24 +208,24 @@ public class BranchSession implements Lockable, Comparable<BranchSession>, Sessi
         }
         if (null != applicationId) {
             byte[] applicationIdBytes = applicationId.getBytes();
-            byteBuffer.putShort((short)applicationIdBytes.length);
+            byteBuffer.putShort((short) applicationIdBytes.length);
             byteBuffer.put(applicationIdBytes);
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
         if (null != txServiceGroup) {
             byte[] txServiceGroupBytes = txServiceGroup.getBytes();
-            byteBuffer.putShort((short)txServiceGroupBytes.length);
+            byteBuffer.putShort((short) txServiceGroupBytes.length);
             byteBuffer.put(txServiceGroupBytes);
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
         if (null != clientId) {
             byte[] clientIdBytes = clientId.getBytes();
-            byteBuffer.putShort((short)clientIdBytes.length);
+            byteBuffer.putShort((short) clientIdBytes.length);
             byteBuffer.put(clientIdBytes);
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
         if (null != applicationData) {
             byte[] applicationDataBytes = applicationData.getBytes();

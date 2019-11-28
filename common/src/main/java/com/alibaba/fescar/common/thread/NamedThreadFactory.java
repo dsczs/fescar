@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.common.thread;
 
+import io.netty.util.concurrent.FastThreadLocalThread;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import io.netty.util.concurrent.FastThreadLocalThread;
 
 /**
  * The type Named thread factory.

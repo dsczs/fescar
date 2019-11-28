@@ -39,7 +39,7 @@ public class NettyPoolKey {
      * Instantiates a new Netty pool key.
      *
      * @param transactionRole the client role
-     * @param address    the address
+     * @param address         the address
      */
     public NettyPoolKey(TransactionRole transactionRole, String address) {
         this.transactionRole = transactionRole;
@@ -50,8 +50,8 @@ public class NettyPoolKey {
      * Instantiates a new Netty pool key.
      *
      * @param transactionRole the client role
-     * @param address    the address
-     * @param message    the message
+     * @param address         the address
+     * @param message         the message
      */
     public NettyPoolKey(TransactionRole transactionRole, String address, AbstractMessage message) {
         this.transactionRole = transactionRole;
@@ -140,6 +140,11 @@ public class NettyPoolKey {
          */
         SERVERROLE(3);
 
+        /**
+         * 状态值
+         */
+        private int value;
+
         private TransactionRole(int value) {
             this.value = value;
         }
@@ -152,10 +157,5 @@ public class NettyPoolKey {
         public int getValue() {
             return value;
         }
-
-        /**
-         * 状态值
-         */
-        private int value;
     }
 }

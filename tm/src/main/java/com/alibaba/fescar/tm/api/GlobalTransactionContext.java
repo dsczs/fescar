@@ -30,6 +30,7 @@ public class GlobalTransactionContext {
 
     /**
      * Try to create a new GlobalTransaction.
+     *
      * @return
      */
     private static GlobalTransaction createNew() {

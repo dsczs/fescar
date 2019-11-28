@@ -76,7 +76,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
         ctx.fireUserEventTriggered(evt);
         if (evt instanceof IdleStateEvent) {
 
-            IdleStateEvent event = (IdleStateEvent)evt;
+            IdleStateEvent event = (IdleStateEvent) evt;
 
             if (event.state().equals(IdleState.READER_IDLE)) {
 
@@ -117,7 +117,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        LOGGER.info("channel inactive for ServerProxyHandler at :[{}],[{}]", ctx.channel(),ctx.channel().remoteAddress());
+        LOGGER.info("channel inactive for ServerProxyHandler at :[{}],[{}]", ctx.channel(), ctx.channel().remoteAddress());
     }
 
     @Override

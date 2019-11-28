@@ -33,6 +33,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class DemoCode {
 
+    private static void businessCall1() {
+
+    }
+
+    private static void businessCall2() {
+
+    }
+
+    private static void businessCall3() {
+
+    }
+
     private void init() {
         String applicationId = "my_app";
         String transactionServiceGroup = "my_tx_group";
@@ -100,61 +112,6 @@ public class DemoCode {
 
     }
 
-    private static class MyFailureHandler implements FailureHandler {
-
-        private static final Logger LOGGER = LoggerFactory.getLogger(MyFailureHandler.class);
-
-        @Override
-        public void onBeginFailure(GlobalTransaction tx, Throwable cause) {
-            LOGGER.warn("Failed to begin transaction. ", cause);
-
-        }
-
-        @Override
-        public void onCommitFailure(final GlobalTransaction tx, Throwable cause) {
-            LOGGER.warn("Failed to commit transaction[" + tx.getXid() + "]", cause);
-            final ScheduledExecutorService schedule = new ScheduledThreadPoolExecutor(1,
-                new NamedThreadFactory("BusinessRetryCommit", 1, true));
-            schedule.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        tx.commit();
-                        schedule.shutdownNow();
-
-                    } catch (TransactionException ignore) {
-
-                    }
-
-                }
-            }, 0, 5, TimeUnit.SECONDS);
-
-
-        }
-
-        @Override
-        public void onRollbackFailure(final GlobalTransaction tx, Throwable cause) {
-            LOGGER.warn("Failed to begin transaction[" + tx.getXid() + "]", cause);
-            final ScheduledExecutorService schedule = new ScheduledThreadPoolExecutor(1,
-                new NamedThreadFactory("BusinessRetryRollback", 1, true));
-            schedule.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        tx.rollback();
-                        schedule.shutdownNow();
-
-                    } catch (TransactionException ignore) {
-
-                    }
-
-                }
-            }, 0, 5, TimeUnit.SECONDS);
-
-        }
-
-    }
-
     /**
      * Demo code for Low Level API (GlobalTransaction) usage.
      *
@@ -210,15 +167,58 @@ public class DemoCode {
         }
     }
 
-    private static void businessCall1() {
+    private static class MyFailureHandler implements FailureHandler {
 
-    }
+        private static final Logger LOGGER = LoggerFactory.getLogger(MyFailureHandler.class);
 
-    private static void businessCall2() {
+        @Override
+        public void onBeginFailure(GlobalTransaction tx, Throwable cause) {
+            LOGGER.warn("Failed to begin transaction. ", cause);
 
-    }
+        }
 
-    private static void businessCall3() {
+        @Override
+        public void onCommitFailure(final GlobalTransaction tx, Throwable cause) {
+            LOGGER.warn("Failed to commit transaction[" + tx.getXid() + "]", cause);
+            final ScheduledExecutorService schedule = new ScheduledThreadPoolExecutor(1,
+                    new NamedThreadFactory("BusinessRetryCommit", 1, true));
+            schedule.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        tx.commit();
+                        schedule.shutdownNow();
+
+                    } catch (TransactionException ignore) {
+
+                    }
+
+                }
+            }, 0, 5, TimeUnit.SECONDS);
+
+
+        }
+
+        @Override
+        public void onRollbackFailure(final GlobalTransaction tx, Throwable cause) {
+            LOGGER.warn("Failed to begin transaction[" + tx.getXid() + "]", cause);
+            final ScheduledExecutorService schedule = new ScheduledThreadPoolExecutor(1,
+                    new NamedThreadFactory("BusinessRetryRollback", 1, true));
+            schedule.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        tx.rollback();
+                        schedule.shutdownNow();
+
+                    } catch (TransactionException ignore) {
+
+                    }
+
+                }
+            }, 0, 5, TimeUnit.SECONDS);
+
+        }
 
     }
 }

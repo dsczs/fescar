@@ -16,11 +16,11 @@
 
 package com.alibaba.fescar.config;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The type Config future.
@@ -34,13 +34,13 @@ import org.slf4j.LoggerFactory;
 public class ConfigFuture {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFuture.class);
     private static final long DEFAULT_CONFIG_TIMEOUT = 5 * 1000;
+    private final CountDownLatch latch = new CountDownLatch(1);
     private long timeoutMills;
     private long start = System.currentTimeMillis();
     private volatile Object result;
     private String dataId;
     private String content;
     private ConfigOperation operation;
-    private final CountDownLatch latch = new CountDownLatch(1);
 
     /**
      * Instantiates a new Config future.
@@ -101,9 +101,9 @@ public class ConfigFuture {
             boolean success = latch.await(timeout, unit);
             if (!success) {
                 LOGGER.error(
-                    "config operation timeout,cost:" + (System.currentTimeMillis() - start) + " ms,op:" + operation
-                        .name()
-                        + ",dataId:" + dataId);
+                        "config operation timeout,cost:" + (System.currentTimeMillis() - start) + " ms,op:" + operation
+                                .name()
+                                + ",dataId:" + dataId);
                 return getFailResult();
             }
         } catch (InterruptedException exx) {

@@ -16,11 +16,10 @@
 
 package com.alibaba.fescar.core.protocol.transaction;
 
-import java.nio.ByteBuffer;
-
 import com.alibaba.fescar.core.model.BranchType;
-
 import io.netty.buffer.ByteBuf;
+
+import java.nio.ByteBuffer;
 
 public abstract class AbstractBranchEndRequest extends AbstractTransactionRequestToRM {
 
@@ -144,7 +143,7 @@ public abstract class AbstractBranchEndRequest extends AbstractTransactionReques
         this.branchId = in.readLong();
         leftLen -= 8;
         this.branchType = BranchType.get(in.readByte());
-        leftLen --;
+        leftLen--;
 
         int resourceIdLen = in.readShort();
         if (resourceIdLen > 0) {

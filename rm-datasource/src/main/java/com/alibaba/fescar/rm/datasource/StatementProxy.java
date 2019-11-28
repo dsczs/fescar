@@ -16,12 +16,12 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.fescar.rm.datasource.exec.ExecuteTemplate;
+import com.alibaba.fescar.rm.datasource.exec.StatementCallback;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import com.alibaba.fescar.rm.datasource.exec.ExecuteTemplate;
-import com.alibaba.fescar.rm.datasource.exec.StatementCallback;
 
 public class StatementProxy<T extends Statement> extends AbstractStatementProxy<T> {
 

@@ -16,6 +16,16 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.fescar.common.exception.NotSupportYetException;
+import com.alibaba.fescar.common.thread.NamedThreadFactory;
+import com.alibaba.fescar.config.ConfigurationFactory;
+import com.alibaba.fescar.core.exception.TransactionException;
+import com.alibaba.fescar.core.model.BranchStatus;
+import com.alibaba.fescar.core.model.ResourceManagerInbound;
+import com.alibaba.fescar.rm.datasource.undo.UndoLogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,43 +38,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.alibaba.fescar.common.exception.NotSupportYetException;
-import com.alibaba.fescar.common.thread.NamedThreadFactory;
-import com.alibaba.fescar.config.ConfigurationFactory;
-import com.alibaba.fescar.core.exception.TransactionException;
-import com.alibaba.fescar.core.model.BranchStatus;
-import com.alibaba.fescar.core.model.ResourceManagerInbound;
-import com.alibaba.fescar.rm.datasource.undo.UndoLogManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static com.alibaba.fescar.core.service.ConfigurationKeys.CLIENT_ASYNC_COMMIT_BUFFER_LIMIT;
 
 public class AsyncWorker implements ResourceManagerInbound {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncWorker.class);
-
-    private static class Phase2Context {
-
-        public Phase2Context(String xid, long branchId, String resourceId, String applicationData) {
-            this.xid = xid;
-            this.branchId = branchId;
-            this.resourceId = resourceId;
-            this.applicationData = applicationData;
-        }
-
-        String xid;
-        long branchId;
-        String resourceId;
-        String applicationData;
-    }
-
     private static final List<Phase2Context> ASYNC_COMMIT_BUFFER = Collections.synchronizedList(new ArrayList<Phase2Context>());
-
     private static int ASYNC_COMMIT_BUFFER_LIMIT = ConfigurationFactory.getInstance().getInt(
-        CLIENT_ASYNC_COMMIT_BUFFER_LIMIT, 10000);
-
+            CLIENT_ASYNC_COMMIT_BUFFER_LIMIT, 10000);
     private static ScheduledExecutorService timerExecutor;
 
     @Override
@@ -80,7 +61,7 @@ public class AsyncWorker implements ResourceManagerInbound {
     public synchronized void init() {
         LOGGER.info("Async Commit Buffer Limit: " + ASYNC_COMMIT_BUFFER_LIMIT);
         timerExecutor = new ScheduledThreadPoolExecutor(1,
-            new NamedThreadFactory("AsyncWorker", 1, true));
+                new NamedThreadFactory("AsyncWorker", 1, true));
         timerExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -156,5 +137,19 @@ public class AsyncWorker implements ResourceManagerInbound {
     public BranchStatus branchRollback(String xid, long branchId, String resourceId, String applicationData) throws TransactionException {
         throw new NotSupportYetException();
 
+    }
+
+    private static class Phase2Context {
+
+        String xid;
+        long branchId;
+        String resourceId;
+        String applicationData;
+        public Phase2Context(String xid, long branchId, String resourceId, String applicationData) {
+            this.xid = xid;
+            this.branchId = branchId;
+            this.resourceId = resourceId;
+            this.applicationData = applicationData;
+        }
     }
 }

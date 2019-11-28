@@ -16,6 +16,23 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
+import com.alibaba.fescar.common.exception.FrameworkErrorCode;
+import com.alibaba.fescar.common.exception.FrameworkException;
+import com.alibaba.fescar.common.thread.NamedThreadFactory;
+import com.alibaba.fescar.core.protocol.HeartbeatMessage;
+import com.alibaba.fescar.core.protocol.MergeMessage;
+import com.alibaba.fescar.core.protocol.MessageFuture;
+import com.alibaba.fescar.core.protocol.RpcMessage;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.SocketAddress;
@@ -33,24 +50,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.alibaba.fescar.common.exception.FrameworkErrorCode;
-import com.alibaba.fescar.common.exception.FrameworkException;
-import com.alibaba.fescar.common.thread.NamedThreadFactory;
-import com.alibaba.fescar.core.protocol.HeartbeatMessage;
-import com.alibaba.fescar.core.protocol.MergeMessage;
-import com.alibaba.fescar.core.protocol.MessageFuture;
-import com.alibaba.fescar.core.protocol.RpcMessage;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The type Abstract rpc remoting.
  *
@@ -63,11 +62,13 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRpcRemoting.class);
+    private static final long NOT_WRITEABLE_CHECK_MILLS = 10L;
+    private static final int TIMEOUT_CHECK_INTERNAL = 3000;
     /**
      * The Timer executor.
      */
     protected final ScheduledExecutorService timerExecutor = new ScheduledThreadPoolExecutor(1,
-        new NamedThreadFactory("timeoutChecker", 1, true));
+            new NamedThreadFactory("timeoutChecker", 1, true));
     /**
      * The Message executor.
      */
@@ -80,32 +81,33 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
      * The Basket map.
      */
     protected final ConcurrentHashMap<String, BlockingQueue<RpcMessage>> basketMap
-        = new ConcurrentHashMap<String, BlockingQueue<RpcMessage>>();
-
-    private static final long NOT_WRITEABLE_CHECK_MILLS = 10L;
+            = new ConcurrentHashMap<String, BlockingQueue<RpcMessage>>();
     /**
      * The Merge lock.
      */
     protected final Object mergeLock = new Object();
     /**
+     * The Merge msg map.
+     */
+    protected final Map<Long, MergeMessage> mergeMsgMap = new ConcurrentHashMap<Long, MergeMessage>();
+    private final Object lock = new Object();
+    /**
      * The Now mills.
      */
     protected volatile long nowMills = 0;
-    private static final int TIMEOUT_CHECK_INTERNAL = 3000;
-    private final Object lock = new Object();
     /**
      * The Is sending.
      */
     protected boolean isSending = false;
-    private String group = "DEFAULT";
-    /**
-     * The Merge msg map.
-     */
-    protected final Map<Long, MergeMessage> mergeMsgMap = new ConcurrentHashMap<Long, MergeMessage>();
     /**
      * The Channel handlers.
      */
     protected ChannelHandler[] channelHandlers;
+    /**
+     * 用于测试。发现线程池满时可以打开这个变量，把堆栈打出来分享
+     */
+    boolean allowDumpStack = false;
+    private String group = "DEFAULT";
 
     /**
      * Instantiates a new Abstract rpc remoting.
@@ -168,7 +170,7 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
      * @param channel the channel
      * @param msg     the msg
      * @return the object
-     * @throws IOException the io exception
+     * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
     protected Object sendAsyncRequestWithResponse(String address, Channel channel, Object msg) throws TimeoutException {
@@ -183,11 +185,11 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
      * @param msg     the msg
      * @param timeout the timeout
      * @return the object
-     * @throws IOException the io exception
+     * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
     protected Object sendAsyncRequestWithResponse(String address, Channel channel, Object msg, long timeout) throws
-        TimeoutException {
+            TimeoutException {
         if (timeout <= 0) {
             throw new FrameworkException("timeout should more than 0ms");
         }
@@ -201,16 +203,16 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
      * @param channel the channel
      * @param msg     the msg
      * @return the object
-     * @throws IOException the io exception
+     * @throws IOException      the io exception
      * @throws TimeoutException the timeout exception
      */
     protected Object sendAsyncRequestWithoutResponse(String address, Channel channel, Object msg) throws
-        TimeoutException {
+            TimeoutException {
         return sendAsyncRequest(address, channel, msg, 0);
     }
 
     private Object sendAsyncRequest(String address, Channel channel, Object msg, long timeout)
-        throws TimeoutException {
+            throws TimeoutException {
         if (channel == null) {
             LOGGER.warn("sendAsyncRequestWithResponse nothing, caused by null channel.");
             return null;
@@ -266,7 +268,7 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
             } catch (Exception exx) {
                 LOGGER.error("wait response error:" + exx.getMessage() + ",ip:" + address + ",request:" + msg);
                 if (exx instanceof TimeoutException) {
-                    throw (TimeoutException)exx;
+                    throw (TimeoutException) exx;
                 } else {
                     throw new RuntimeException(exx);
                 }
@@ -290,12 +292,12 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
         rpcMessage.setBody(msg);
         rpcMessage.setId(RpcMessage.getNextMessageId());
         if (msg instanceof MergeMessage) {
-            mergeMsgMap.put(rpcMessage.getId(), (MergeMessage)msg);
+            mergeMsgMap.put(rpcMessage.getId(), (MergeMessage) msg);
         }
         channelWriteableCheck(channel, msg);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("write message:" + rpcMessage.getBody() + ", channel:" + channel + ",active?"
-                + channel.isActive() + ",writable?" + channel.isWritable() + ",isopen?" + channel.isOpen());
+                    + channel.isActive() + ",writable?" + channel.isWritable() + ",isopen?" + channel.isOpen());
         }
         channel.writeAndFlush(rpcMessage);
     }
@@ -339,15 +341,10 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
         }
     }
 
-    /**
-     * 用于测试。发现线程池满时可以打开这个变量，把堆栈打出来分享
-     */
-    boolean allowDumpStack = false;
-
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof RpcMessage) {
-            final RpcMessage rpcMessage = (RpcMessage)msg;
+            final RpcMessage rpcMessage = (RpcMessage) msg;
             if (rpcMessage.isRequest()) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(String.format("%s msgId:%s, body:%s", this, rpcMessage.getId(), rpcMessage.getBody()));
@@ -365,7 +362,7 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
                     });
                 } catch (RejectedExecutionException e) {
                     LOGGER.error(FrameworkErrorCode.ThreadPoolFull.errCode,
-                        "thread pool is full, current max pool size is " + messageExecutor.getActiveCount());
+                            "thread pool is full, current max pool size is " + messageExecutor.getActiveCount());
                     if (allowDumpStack) {
                         String name = ManagementFactory.getRuntimeMXBean().getName();
                         String pid = name.split("@")[0];
@@ -382,8 +379,8 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
                 MessageFuture messageFuture = futures.remove(rpcMessage.getId());
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(String
-                        .format("%s msgId:%s, future :%s, body:%s", this, rpcMessage.getId(), messageFuture,
-                            rpcMessage.getBody()));
+                            .format("%s msgId:%s, future :%s, body:%s", this, rpcMessage.getId(), messageFuture,
+                                    rpcMessage.getBody()));
                 }
                 if (messageFuture != null) {
                     messageFuture.setResultMessage(rpcMessage.getBody());
@@ -401,7 +398,7 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
                         });
                     } catch (RejectedExecutionException e) {
                         LOGGER.error(FrameworkErrorCode.ThreadPoolFull.errCode,
-                            "thread pool is full, current max pool size is " + messageExecutor.getActiveCount());
+                                "thread pool is full, current max pool size is " + messageExecutor.getActiveCount());
                     }
                 }
             }
@@ -411,7 +408,7 @@ public abstract class AbstractRpcRemoting extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.error(FrameworkErrorCode.ExceptionCaught.errCode, ctx.channel() + " connect exception. " + cause.getMessage(),
-            cause);
+                cause);
         try {
             destroyChannel(ctx.channel());
         } catch (Exception e) {

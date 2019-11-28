@@ -16,9 +16,9 @@
 
 package com.alibaba.fescar.core.protocol.transaction;
 
-import java.nio.ByteBuffer;
-
 import com.alibaba.fescar.core.protocol.AbstractMessage;
+
+import java.nio.ByteBuffer;
 
 public class GlobalBeginResponse extends AbstractTransactionResponse {
 

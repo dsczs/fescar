@@ -22,10 +22,6 @@ import com.alibaba.fescar.core.protocol.transaction.AbstractTransactionResponse;
 
 public abstract class AbstractExceptionHandler {
 
-    public interface Callback<T extends AbstractTransactionRequest, S extends AbstractTransactionResponse> {
-        void execute(T request, S response) throws TransactionException;
-    }
-
     public void exceptionHandleTemplate(Callback callback, AbstractTransactionRequest request, AbstractTransactionResponse response) {
         try {
             callback.execute(request, response);
@@ -40,6 +36,10 @@ public abstract class AbstractExceptionHandler {
             response.setResultCode(ResultCode.Failed);
             response.setMsg("RuntimeException[" + rex.getMessage() + "]");
         }
+    }
+
+    public interface Callback<T extends AbstractTransactionRequest, S extends AbstractTransactionResponse> {
+        void execute(T request, S response) throws TransactionException;
     }
 
 }

@@ -16,12 +16,12 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.alibaba.fescar.core.exception.TransactionException;
 import com.alibaba.fescar.core.model.BranchStatus;
 import com.alibaba.fescar.core.model.GlobalStatus;
+
+import java.util.Collection;
+import java.util.List;
 
 
 public interface SessionManager extends SessionLifecycleListener {

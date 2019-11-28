@@ -20,6 +20,10 @@ import com.alibaba.fescar.common.loader.EnhancedServiceLoader;
 
 public class ContextCoreLoader {
 
+    public static ContextCore load() {
+        return ContextCoreHolder.INSTANCE;
+    }
+
     private static class ContextCoreHolder {
         private static ContextCore INSTANCE;
 
@@ -31,10 +35,6 @@ public class ContextCoreLoader {
             }
             INSTANCE = contextCore;
         }
-    }
-
-    public static ContextCore load() {
-        return ContextCoreHolder.INSTANCE;
     }
 
 }

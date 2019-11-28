@@ -21,7 +21,6 @@ import com.alibaba.fescar.spring.annotation.GlobalTransactional;
 import com.alibaba.fescar.tm.dubbo.BusinessService;
 import com.alibaba.fescar.tm.dubbo.OrderService;
 import com.alibaba.fescar.tm.dubbo.StorageService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -39,6 +38,16 @@ public class BusinessServiceImpl implements BusinessService {
     private StorageService storageService;
     private OrderService orderService;
 
+    public static void main(String[] args) {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                new String[]{"dubbo-business.xml"});
+        final BusinessService business = (BusinessService) context.getBean("business");
+
+        LOGGER.info("Main business begin ... xid: " + RootContext.getXID());
+        business.purchase("U100001", "C00321", 2);
+        LOGGER.info("Main business end ... xid: " + RootContext.getXID());
+    }
+
     @Override
     @GlobalTransactional(timeoutMills = 300000, name = "dubbo-demo-tx")
     public void purchase(String userId, String commodityCode, int orderCount) {
@@ -54,15 +63,5 @@ public class BusinessServiceImpl implements BusinessService {
 
     public void setOrderService(OrderService orderService) {
         this.orderService = orderService;
-    }
-
-    public static void main(String[] args) {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-            new String[] {"dubbo-business.xml"});
-        final BusinessService business = (BusinessService)context.getBean("business");
-
-        LOGGER.info("Main business begin ... xid: " + RootContext.getXID());
-        business.purchase("U100001", "C00321", 2);
-        LOGGER.info("Main business end ... xid: " + RootContext.getXID());
     }
 }

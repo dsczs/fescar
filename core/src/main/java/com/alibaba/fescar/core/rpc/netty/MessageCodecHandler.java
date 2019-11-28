@@ -16,19 +16,18 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.nio.ByteBuffer;
-import java.util.List;
-
 import com.alibaba.fescar.core.protocol.AbstractMessage;
 import com.alibaba.fescar.core.protocol.HeartbeatMessage;
 import com.alibaba.fescar.core.protocol.MessageCodec;
 import com.alibaba.fescar.core.protocol.RpcMessage;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * The type Message codec handler.
@@ -42,32 +41,79 @@ import org.slf4j.LoggerFactory;
 public class MessageCodecHandler extends ByteToMessageCodec<RpcMessage> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageCodecHandler.class);
-    private static short MAGIC = (short)0xdada;
-    private static int HEAD_LENGTH = 14;
     private static final int FLAG_REQUEST = 0x80;
     private static final int FLAG_ASYNC = 0x40;
     private static final int FLAG_HEARTBEAT = 0x20;
     private static final int FLAG_FESCAR_CODEC = 0x10;
     private static final int MAGIC_HALF = -38;
     private static final int NOT_FOUND_INDEX = -1;
+    private static short MAGIC = (short) 0xdada;
+    private static int HEAD_LENGTH = 14;
+
+    /**
+     * Hessian serialize byte [ ].
+     *
+     * @param object the object
+     * @return the byte [ ]
+     * @throws Exception the exception
+     */
+    private static byte[] hessianSerialize(Object object) throws Exception {
+        if (object == null) {
+            throw new NullPointerException();
+        }
+        //todo user defined exx
+        throw new RuntimeException("hessianSerialize not support");
+
+    }
+
+    /**
+     * Hessian deserialize object.
+     *
+     * @param bytes the bytes
+     * @return the object
+     * @throws Exception the exception
+     */
+    private static Object hessianDeserialize(byte[] bytes) throws Exception {
+        if (bytes == null) {
+            throw new NullPointerException();
+        }
+        //todo user defined exx
+        throw new RuntimeException("hessianDeserialize not support");
+
+    }
+
+    private static int getMagicIndex(ByteBuf in) {
+        boolean found = false;
+        int readIndex = in.readerIndex();
+        int begin = 0;
+        while (readIndex < in.writerIndex()) {
+            if (in.getByte(readIndex) == MAGIC_HALF && in.getByte(readIndex + 1) == MAGIC_HALF) {
+                begin = readIndex;
+                found = true;
+                break;
+            }
+            ++readIndex;
+        }
+        return found ? begin : NOT_FOUND_INDEX;
+    }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcMessage msg, ByteBuf out) throws Exception {
         MessageCodec msgCodec = null;
         ByteBuffer byteBuffer = ByteBuffer.allocate(128);
         if (msg.getBody() instanceof MessageCodec) {
-            msgCodec = (MessageCodec)msg.getBody();
+            msgCodec = (MessageCodec) msg.getBody();
         }
         byteBuffer.putShort(MAGIC);
         int flag = (msg.isAsync() ? FLAG_ASYNC : 0)
-            | (msg.isHeartbeat() ? FLAG_HEARTBEAT : 0)
-            | (msg.isRequest() ? FLAG_REQUEST : 0)
-            | (msgCodec != null ? FLAG_FESCAR_CODEC : 0);
+                | (msg.isHeartbeat() ? FLAG_HEARTBEAT : 0)
+                | (msg.isRequest() ? FLAG_REQUEST : 0)
+                | (msgCodec != null ? FLAG_FESCAR_CODEC : 0);
 
-        byteBuffer.putShort((short)flag);
+        byteBuffer.putShort((short) flag);
 
         if (msg.getBody() instanceof HeartbeatMessage) {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
             byteBuffer.putLong(msg.getId());
             byteBuffer.flip();
             byte[] content = new byte[byteBuffer.limit()];
@@ -91,7 +137,7 @@ public class MessageCodecHandler extends ByteToMessageCodec<RpcMessage> {
                     LOGGER.info("msg:" + msg.getBody().toString());
                 }
                 byte[] body = hessianSerialize(msg.getBody());
-                byteBuffer.putShort((short)body.length);
+                byteBuffer.putShort((short) body.length);
                 byteBuffer.putLong(msg.getId());
                 byteBuffer.put(body);
 
@@ -143,7 +189,11 @@ public class MessageCodecHandler extends ByteToMessageCodec<RpcMessage> {
 
         short bodyLength = 0;
         short typeCode = 0;
-        if (!isFescarCodec) { bodyLength = byteBuffer.getShort(); } else { typeCode = byteBuffer.getShort(); }
+        if (!isFescarCodec) {
+            bodyLength = byteBuffer.getShort();
+        } else {
+            typeCode = byteBuffer.getShort();
+        }
         long msgId = byteBuffer.getLong();
 
         if (isHeartbeat) {
@@ -196,55 +246,8 @@ public class MessageCodecHandler extends ByteToMessageCodec<RpcMessage> {
         out.add(rpcMessage);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Receive:" + rpcMessage.getBody() + ",messageId:"
-                + msgId);
+                    + msgId);
         }
 
-    }
-
-    /**
-     * Hessian serialize byte [ ].
-     *
-     * @param object the object
-     * @return the byte [ ]
-     * @throws Exception the exception
-     */
-    private static byte[] hessianSerialize(Object object) throws Exception {
-        if (object == null) {
-            throw new NullPointerException();
-        }
-        //todo user defined exx
-        throw new RuntimeException("hessianSerialize not support");
-
-    }
-
-    /**
-     * Hessian deserialize object.
-     *
-     * @param bytes the bytes
-     * @return the object
-     * @throws Exception the exception
-     */
-    private static Object hessianDeserialize(byte[] bytes) throws Exception {
-        if (bytes == null) {
-            throw new NullPointerException();
-        }
-        //todo user defined exx
-        throw new RuntimeException("hessianDeserialize not support");
-
-    }
-
-    private static int getMagicIndex(ByteBuf in) {
-        boolean found = false;
-        int readIndex = in.readerIndex();
-        int begin = 0;
-        while (readIndex < in.writerIndex()) {
-            if (in.getByte(readIndex) == MAGIC_HALF && in.getByte(readIndex + 1) == MAGIC_HALF) {
-                begin = readIndex;
-                found = true;
-                break;
-            }
-            ++readIndex;
-        }
-        return found ? begin : NOT_FOUND_INDEX;
     }
 }

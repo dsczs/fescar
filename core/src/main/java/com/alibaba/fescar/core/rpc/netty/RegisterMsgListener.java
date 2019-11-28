@@ -17,7 +17,6 @@
 package com.alibaba.fescar.core.rpc.netty;
 
 import com.alibaba.fescar.core.protocol.AbstractMessage;
-
 import io.netty.channel.Channel;
 
 /**

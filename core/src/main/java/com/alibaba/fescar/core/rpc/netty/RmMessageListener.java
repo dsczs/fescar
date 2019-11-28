@@ -18,13 +18,13 @@ package com.alibaba.fescar.core.rpc.netty;
 
 import com.alibaba.fescar.common.exception.FrameworkErrorCode;
 import com.alibaba.fescar.core.protocol.ResultCode;
-import com.alibaba.fescar.core.protocol.transaction.*;
 import com.alibaba.fescar.core.protocol.transaction.BranchCommitRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchCommitResponse;
 import com.alibaba.fescar.core.protocol.transaction.BranchRollbackRequest;
+import com.alibaba.fescar.core.protocol.transaction.BranchRollbackResponse;
 import com.alibaba.fescar.core.rpc.ClientMessageListener;
 import com.alibaba.fescar.core.rpc.ClientMessageSender;
 import com.alibaba.fescar.core.rpc.TransactionMessageHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +62,9 @@ public class RmMessageListener implements ClientMessageListener {
             LOGGER.info("onMessage:" + msg);
         }
         if (msg instanceof BranchCommitRequest) {
-            handleBranchCommit(msgId, serverAddress, (BranchCommitRequest)msg, sender);
+            handleBranchCommit(msgId, serverAddress, (BranchCommitRequest) msg, sender);
         } else if (msg instanceof BranchRollbackRequest) {
-            handleBranchRollback(msgId, serverAddress, (BranchRollbackRequest)msg, sender);
+            handleBranchRollback(msgId, serverAddress, (BranchRollbackRequest) msg, sender);
         }
     }
 
@@ -72,7 +72,7 @@ public class RmMessageListener implements ClientMessageListener {
                                       BranchRollbackRequest branchRollbackRequest,
                                       ClientMessageSender sender) {
         BranchRollbackResponse resultMessage = null;
-        resultMessage = (BranchRollbackResponse)handler.onRequest(branchRollbackRequest, null);
+        resultMessage = (BranchRollbackResponse) handler.onRequest(branchRollbackRequest, null);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("branch rollback result:" + resultMessage);
         }
@@ -89,7 +89,7 @@ public class RmMessageListener implements ClientMessageListener {
 
         BranchCommitResponse resultMessage = null;
         try {
-            resultMessage = (BranchCommitResponse)handler.onRequest(branchCommitRequest, null);
+            resultMessage = (BranchCommitResponse) handler.onRequest(branchCommitRequest, null);
             sender.sendResponse(msgId, serverAddress, resultMessage);
         } catch (Exception e) {
             LOGGER.error(FrameworkErrorCode.NetOnMessage.errCode, e.getMessage(), e);

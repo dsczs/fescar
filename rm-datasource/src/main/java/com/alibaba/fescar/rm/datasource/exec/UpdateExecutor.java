@@ -16,13 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.exec;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fescar.rm.datasource.ParametersHolder;
 import com.alibaba.fescar.rm.datasource.StatementProxy;
 import com.alibaba.fescar.rm.datasource.sql.SQLRecognizer;
@@ -30,6 +23,13 @@ import com.alibaba.fescar.rm.datasource.sql.SQLUpdateRecognizer;
 import com.alibaba.fescar.rm.datasource.sql.struct.Field;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableMeta;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecutor<T, S> {
 
@@ -74,7 +74,7 @@ public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
                 rs = st.executeQuery(selectSQL);
             } else {
                 ps = statementProxy.getConnection().prepareStatement(selectSQL);
-                for (int i = 0; i< paramAppender.size(); i++) {
+                for (int i = 0; i < paramAppender.size(); i++) {
                     ps.setObject(i + 1, paramAppender.get(i));
                 }
                 rs = ps.executeQuery();

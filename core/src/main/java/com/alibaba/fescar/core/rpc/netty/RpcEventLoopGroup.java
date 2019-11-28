@@ -16,9 +16,9 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.util.concurrent.ThreadFactory;
-
 import io.netty.channel.EventLoopGroup;
+
+import java.util.concurrent.ThreadFactory;
 
 /**
  * The interface Rpc event loop group.
@@ -29,7 +29,7 @@ import io.netty.channel.EventLoopGroup;
  * @FileName: RpcEventLoopGroup
  * @Description:
  */
-public interface RpcEventLoopGroup  {
+public interface RpcEventLoopGroup {
 
     // EventLoopGroup WORKER_GROUP = new RpcEventLoopGroup() {
     //    @Override

@@ -16,14 +16,14 @@
 
 package com.alibaba.fescar.rm.datasource.sql.struct;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 
 public class TableRecords {
 
@@ -34,65 +34,12 @@ public class TableRecords {
 
     private List<Row> rows = new ArrayList<Row>();
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public List<Row> getRows() {
-        return rows;
-    }
-
-    public void setRows(List<Row> rows) {
-        this.rows = rows;
-    }
-
     public TableRecords() {
 
     }
 
     public TableRecords(TableMeta tableMeta) {
         setTableMeta(tableMeta);
-    }
-
-    public void setTableMeta(TableMeta tableMeta) {
-        if (this.tableMeta != null) {
-            throw new ShouldNeverHappenException();
-        }
-        this.tableMeta = tableMeta;
-        this.tableName = tableMeta.getTableName();
-    }
-
-    public int size() {
-        return rows.size();
-    }
-
-    public void add(Row row) {
-        rows.add(row);
-    }
-
-    public List<Field> pkRows() {
-        final String pkName = getTableMeta().getPkName();
-        return new ArrayList<Field>() {
-            {
-                for (Row row : rows) {
-                    List<Field> fields = row.getFields();
-                    for (Field field : fields) {
-                        if (field.getName().equalsIgnoreCase(pkName)) {
-                            add(field);
-                            break;
-                        }
-                    }
-                }
-            }
-        };
-    }
-
-    public TableMeta getTableMeta() {
-        return tableMeta;
     }
 
     public static TableRecords empty(TableMeta tableMeta) {
@@ -145,5 +92,58 @@ public class TableRecords {
             records.add(row);
         }
         return records;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public List<Row> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<Row> rows) {
+        this.rows = rows;
+    }
+
+    public int size() {
+        return rows.size();
+    }
+
+    public void add(Row row) {
+        rows.add(row);
+    }
+
+    public List<Field> pkRows() {
+        final String pkName = getTableMeta().getPkName();
+        return new ArrayList<Field>() {
+            {
+                for (Row row : rows) {
+                    List<Field> fields = row.getFields();
+                    for (Field field : fields) {
+                        if (field.getName().equalsIgnoreCase(pkName)) {
+                            add(field);
+                            break;
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    public TableMeta getTableMeta() {
+        return tableMeta;
+    }
+
+    public void setTableMeta(TableMeta tableMeta) {
+        if (this.tableMeta != null) {
+            throw new ShouldNeverHappenException();
+        }
+        this.tableMeta = tableMeta;
+        this.tableName = tableMeta.getTableName();
     }
 }

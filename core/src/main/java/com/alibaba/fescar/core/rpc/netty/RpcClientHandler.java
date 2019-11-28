@@ -50,7 +50,7 @@ public class RpcClientHandler extends ChannelDuplexHandler {
     public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         final Channel channel = ctx.channel();
 
-        final String request = (String)msg;
+        final String request = (String) msg;
         try {
             ctx.writeAndFlush(request, ctx.voidPromise());
             LOGGER.info("client:" + msg);
@@ -63,30 +63,30 @@ public class RpcClientHandler extends ChannelDuplexHandler {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        LOGGER.info("channel active for ClientProxyHandler at :[{}]",ctx.channel());
+        LOGGER.info("channel active for ClientProxyHandler at :[{}]", ctx.channel());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        LOGGER.info("channel inactive for ClientProxyHandler at :[{}]",ctx.channel());
+        LOGGER.info("channel inactive for ClientProxyHandler at :[{}]", ctx.channel());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.close();
-        LOGGER.info("channel error for ClientProxyHandler at :[{}]",ctx.channel());
+        LOGGER.info("channel error for ClientProxyHandler at :[{}]", ctx.channel());
     }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        LOGGER.info("channel write for ClientProxyHandler at :[{}]",msg);
+        LOGGER.info("channel write for ClientProxyHandler at :[{}]", msg);
         ctx.write(msg, promise);
     }
 
     @Override
     public void flush(ChannelHandlerContext ctx) throws Exception {
-        LOGGER.info("channel flush for ClientProxyHandler at :[{}]",ctx.channel());
+        LOGGER.info("channel flush for ClientProxyHandler at :[{}]", ctx.channel());
         ctx.flush();
     }
 }

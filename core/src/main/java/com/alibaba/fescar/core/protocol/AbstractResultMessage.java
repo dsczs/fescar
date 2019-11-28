@@ -16,9 +16,9 @@
 
 package com.alibaba.fescar.core.protocol;
 
-import java.nio.ByteBuffer;
-
 import io.netty.buffer.ByteBuf;
+
+import java.nio.ByteBuffer;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -29,10 +29,9 @@ import io.netty.buffer.ByteBuf;
  */
 public abstract class AbstractResultMessage extends AbstractMessage implements MergedMessage {
     private static final long serialVersionUID = 6540352050650203313L;
-
-    private ResultCode resultCode;
-
     public ByteBuffer byteBuffer = ByteBuffer.allocate(512);
+    private ResultCode resultCode;
+    private String msg;
 
     public ResultCode getResultCode() {
         return resultCode;
@@ -41,8 +40,6 @@ public abstract class AbstractResultMessage extends AbstractMessage implements M
     public void setResultCode(ResultCode resultCode) {
         this.resultCode = resultCode;
     }
-
-    private String msg;
 
     public String getMsg() {
         return msg;

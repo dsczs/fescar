@@ -16,11 +16,11 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.util.List;
-
 import com.alibaba.fescar.server.store.SessionStorable;
 import com.alibaba.fescar.server.store.TransactionStoreManager;
 import com.alibaba.fescar.server.store.TransactionWriteStore;
+
+import java.util.List;
 
 public class DefaultSessionManager extends AbstractSessionManager {
 

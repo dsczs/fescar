@@ -16,13 +16,12 @@
 
 package com.alibaba.fescar.common.util;
 
+import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
+
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.Blob;
-
-import javax.sql.rowset.serial.SerialBlob;
-
-import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 
 public class BlobUtils {
 

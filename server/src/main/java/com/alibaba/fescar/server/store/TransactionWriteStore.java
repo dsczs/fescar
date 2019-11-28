@@ -16,12 +16,12 @@
 
 package com.alibaba.fescar.server.store;
 
-import java.nio.ByteBuffer;
-
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 import com.alibaba.fescar.server.session.BranchSession;
 import com.alibaba.fescar.server.session.GlobalSession;
 import com.alibaba.fescar.server.store.TransactionStoreManager.LogOperation;
+
+import java.nio.ByteBuffer;
 
 /**
  * The type Transaction write store.
@@ -50,7 +50,8 @@ public class TransactionWriteStore implements SessionStorable {
     /**
      * Instantiates a new Transaction write store.
      */
-    public TransactionWriteStore() {}
+    public TransactionWriteStore() {
+    }
 
     /**
      * Gets session request.

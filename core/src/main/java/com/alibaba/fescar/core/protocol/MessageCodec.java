@@ -27,6 +27,8 @@ import io.netty.buffer.ByteBuf;
  */
 public interface MessageCodec {
     short getTypeCode();
+
     byte[] encode();
+
     boolean decode(ByteBuf in);
 }

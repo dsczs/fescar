@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.io.IOException;
-
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 import com.alibaba.fescar.core.exception.TransactionException;
+
+import java.io.IOException;
 
 public class SessionHolder {
 
@@ -61,18 +61,21 @@ public class SessionHolder {
         }
         return ROOT_SESSION_MANAGER;
     }
+
     public static final SessionManager getAsyncCommittingSessionManager() {
         if (ASYNC_COMMITTING_SESSION_MANAGER == null) {
             throw new ShouldNeverHappenException("SessionManager is NOT init!");
         }
         return ASYNC_COMMITTING_SESSION_MANAGER;
     }
+
     public static final SessionManager getRetryCommittingSessionManager() {
         if (RETRY_COMMITTING_SESSION_MANAGER == null) {
             throw new ShouldNeverHappenException("SessionManager is NOT init!");
         }
         return RETRY_COMMITTING_SESSION_MANAGER;
     }
+
     public static final SessionManager getRetryRollbackingSessionManager() {
         if (RETRY_ROLLBACKING_SESSION_MANAGER == null) {
             throw new ShouldNeverHappenException("SessionManager is NOT init!");

@@ -28,14 +28,15 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RpcMessage {
 
     private static AtomicLong NEXT_ID = new AtomicLong(0);
-    public static  long getNextMessageId() {
-        return NEXT_ID.incrementAndGet();
-    }
     private long id;
     private boolean isAsync;
     private boolean isRequest;
     private boolean isHeartbeat;
     private Object body;
+
+    public static long getNextMessageId() {
+        return NEXT_ID.incrementAndGet();
+    }
 
     public long getId() {
         return id;

@@ -16,18 +16,11 @@
 
 package com.alibaba.fescar.spring.annotation;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 import com.alibaba.fescar.common.exception.NotSupportYetException;
 import com.alibaba.fescar.config.ConfigurationFactory;
 import com.alibaba.fescar.rm.RMClientAT;
 import com.alibaba.fescar.tm.TMClient;
 import com.alibaba.fescar.tm.api.FailureHandler;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +31,12 @@ import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * The type Global transaction scanner.
@@ -58,18 +57,14 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator implement
     private static final int ORDER_NUM = 1024;
 
     private static final Set<String> PROXYED_SET = new HashSet<>();
-
-    private GlobalTransactionalInterceptor interceptor;
-
+    private static final int DEFAULT_MODE = AT_MODE;
     private final String applicationId;
     private final String txServiceGroup;
     private final int mode;
     private final boolean disableGlobalTransaction =
-        ConfigurationFactory.getInstance().getBoolean("service.disableGlobalTransaction", false);
-
-    private static final int DEFAULT_MODE = AT_MODE;
-
+            ConfigurationFactory.getInstance().getBoolean("service.disableGlobalTransaction", false);
     private final FailureHandler failureHandlerHook;
+    private GlobalTransactionalInterceptor interceptor;
 
     /**
      * Instantiates a new Global transaction scanner.
@@ -113,6 +108,7 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator implement
 
     /**
      * Instantiates a new Global transaction scanner.
+     *
      * @param applicationId      the application id
      * @param txServiceGroup     the tx service group
      * @param failureHandlerHook the failure handler hook
@@ -145,21 +141,21 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator implement
         }
         if (StringUtils.isEmpty(applicationId) || StringUtils.isEmpty(txServiceGroup)) {
             throw new IllegalArgumentException(
-                "applicationId: " + applicationId + ", txServiceGroup: " + txServiceGroup);
+                    "applicationId: " + applicationId + ", txServiceGroup: " + txServiceGroup);
         }
         TMClient.init(applicationId, txServiceGroup);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(
-                "Transaction Manager Client is initialized. applicationId[" + applicationId + "] txServiceGroup["
-                    + txServiceGroup + "]");
+                    "Transaction Manager Client is initialized. applicationId[" + applicationId + "] txServiceGroup["
+                            + txServiceGroup + "]");
         }
         if ((AT_MODE & mode) > 0) {
             RMClientAT.init(applicationId, txServiceGroup);
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info(
-                    "Resource Manager for AT Client is initialized. applicationId[" + applicationId
-                        + "] txServiceGroup["
-                        + txServiceGroup + "]");
+                        "Resource Manager for AT Client is initialized. applicationId[" + applicationId
+                                + "] txServiceGroup["
+                                + txServiceGroup + "]");
             }
         }
         if ((MT_MODE & mode) > 0) {
@@ -237,13 +233,13 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator implement
         Object dynamicAdvisedInterceptor = h.get(proxy);
         Field advised = dynamicAdvisedInterceptor.getClass().getDeclaredField("advised");
         advised.setAccessible(true);
-        return (AdvisedSupport)advised.get(dynamicAdvisedInterceptor);
+        return (AdvisedSupport) advised.get(dynamicAdvisedInterceptor);
     }
 
     @Override
     protected Object[] getAdvicesAndAdvisorsForBean(Class beanClass, String beanName, TargetSource customTargetSource)
-        throws BeansException {
-        return new Object[] {interceptor};
+            throws BeansException {
+        return new Object[]{interceptor};
     }
 
     @Override

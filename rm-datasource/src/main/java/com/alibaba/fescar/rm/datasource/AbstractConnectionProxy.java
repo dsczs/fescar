@@ -16,6 +16,8 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.fescar.core.context.RootContext;
+
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -34,8 +36,6 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
-
-import com.alibaba.fescar.core.context.RootContext;
 
 public abstract class AbstractConnectionProxy implements Connection {
 
@@ -107,19 +107,13 @@ public abstract class AbstractConnectionProxy implements Connection {
     }
 
     @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        targetConnection.setReadOnly(readOnly);
-
-    }
-
-    @Override
     public boolean isReadOnly() throws SQLException {
         return targetConnection.isReadOnly();
     }
 
     @Override
-    public void setCatalog(String catalog) throws SQLException {
-        targetConnection.setCatalog(catalog);
+    public void setReadOnly(boolean readOnly) throws SQLException {
+        targetConnection.setReadOnly(readOnly);
 
     }
 
@@ -129,14 +123,20 @@ public abstract class AbstractConnectionProxy implements Connection {
     }
 
     @Override
-    public void setTransactionIsolation(int level) throws SQLException {
-        targetConnection.setTransactionIsolation(level);
+    public void setCatalog(String catalog) throws SQLException {
+        targetConnection.setCatalog(catalog);
 
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
         return targetConnection.getTransactionIsolation();
+    }
+
+    @Override
+    public void setTransactionIsolation(int level) throws SQLException {
+        targetConnection.setTransactionIsolation(level);
+
     }
 
     @Override
@@ -180,14 +180,14 @@ public abstract class AbstractConnectionProxy implements Connection {
     }
 
     @Override
-    public void setHoldability(int holdability) throws SQLException {
-        targetConnection.setHoldability(holdability);
-
+    public int getHoldability() throws SQLException {
+        return targetConnection.getHoldability();
     }
 
     @Override
-    public int getHoldability() throws SQLException {
-        return targetConnection.getHoldability();
+    public void setHoldability(int holdability) throws SQLException {
+        targetConnection.setHoldability(holdability);
+
     }
 
     @Override
@@ -280,12 +280,6 @@ public abstract class AbstractConnectionProxy implements Connection {
     }
 
     @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        targetConnection.setClientInfo(properties);
-
-    }
-
-    @Override
     public String getClientInfo(String name) throws SQLException {
         return targetConnection.getClientInfo(name);
     }
@@ -293,6 +287,12 @@ public abstract class AbstractConnectionProxy implements Connection {
     @Override
     public Properties getClientInfo() throws SQLException {
         return targetConnection.getClientInfo();
+    }
+
+    @Override
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        targetConnection.setClientInfo(properties);
+
     }
 
     @Override
@@ -306,14 +306,14 @@ public abstract class AbstractConnectionProxy implements Connection {
     }
 
     @Override
-    public void setSchema(String schema) throws SQLException {
-        targetConnection.setSchema(schema);
-
+    public String getSchema() throws SQLException {
+        return targetConnection.getSchema();
     }
 
     @Override
-    public String getSchema() throws SQLException {
-        return targetConnection.getSchema();
+    public void setSchema(String schema) throws SQLException {
+        targetConnection.setSchema(schema);
+
     }
 
     @Override

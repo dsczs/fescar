@@ -16,19 +16,18 @@
 
 package com.alibaba.fescar.server.lock;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 import com.alibaba.fescar.common.util.StringUtils;
 import com.alibaba.fescar.core.exception.TransactionException;
 import com.alibaba.fescar.server.session.BranchSession;
-
 import io.netty.util.internal.ConcurrentSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultLockManagerImpl implements LockManager {
 
@@ -48,13 +47,13 @@ public class DefaultLockManagerImpl implements LockManager {
             dbLockMap = LOCK_MAP.get(resourceId);
         }
         ConcurrentHashMap<Map<String, Long>, Set<String>> bucketHolder = branchSession.getLockHolder();
-        
+
         String lockKey = branchSession.getLockKey();
-        if(StringUtils.isEmpty(lockKey)) {
+        if (StringUtils.isEmpty(lockKey)) {
             return true;
         }
-        
-            String[] tableGroupedLockKeys = lockKey.split(";");
+
+        String[] tableGroupedLockKeys = lockKey.split(";");
         for (String tableGroupedLockKey : tableGroupedLockKeys) {
             int idx = tableGroupedLockKey.indexOf(":");
             if (idx < 0) {

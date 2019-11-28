@@ -21,61 +21,58 @@ package com.alibaba.fescar.rm.datasource.sql.struct;
  */
 public class Field {
 
-	public String name;
+    public String name;
+    public int type;
+    public Object value;
+    private KeyType keyType = KeyType.NULL;
 
-	private KeyType keyType = KeyType.NULL;
+    public Field() {
+    }
 
-	public int type;
+    public Field(String name, int type, Object value) {
+        this.name = name;
+        this.type = type;
+        this.value = value;
+    }
 
-	public Object value;
+    public String getName() {
+        return name;
+    }
 
-	public Field() {
-	}
+    public void setName(String attrName) {
+        this.name = attrName;
+    }
 
-	public Field(String name, int type, Object value) {
-		this.name = name;
-		this.type = type;
-		this.value = value;
-	}
+    public KeyType getKeyType() {
+        return keyType;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setKeyType(KeyType keyType) {
+        this.keyType = keyType;
+    }
 
-	public void setName(String attrName) {
-		this.name = attrName;
-	}
+    public int getType() {
+        return type;
+    }
 
-	public KeyType getKeyType() {
-		return keyType;
-	}
+    public void setType(int attrType) {
+        this.type = attrType;
+    }
 
-	public void setKeyType(KeyType keyType) {
-		this.keyType = keyType;
-	}
+    public Object getValue() {
+        return value;
+    }
 
-	public int getType() {
-		return type;
-	}
+    public void setValue(Object value) {
+        this.value = value;
+    }
 
-	public void setType(int attrType) {
-		this.type = attrType;
-	}
+    public boolean isKey(String pkname) {
+        return name.equalsIgnoreCase(pkname);
+    }
 
-	public Object getValue() {
-		return value;
-	}
-
-	public void setValue(Object value) {
-		this.value = value;
-	}
-
-	public boolean isKey(String pkname) {
-		return name.equalsIgnoreCase(pkname);
-	}
-
-	@Override
-	public String toString() {
-		return String.format("[%s,%s]", name, String.valueOf(value));
-	}
+    @Override
+    public String toString() {
+        return String.format("[%s,%s]", name, String.valueOf(value));
+    }
 }

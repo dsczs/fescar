@@ -70,6 +70,7 @@ public enum TransactionExceptionCode {
     public static TransactionExceptionCode get(byte ordinal) {
         return get((int) ordinal);
     }
+
     public static TransactionExceptionCode get(int ordinal) {
         for (TransactionExceptionCode value : TransactionExceptionCode.values()) {
             if (value.ordinal() == ordinal) {

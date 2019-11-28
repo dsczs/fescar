@@ -16,12 +16,11 @@
 
 package com.alibaba.fescar.core.protocol.transaction;
 
-import java.nio.ByteBuffer;
-
 import com.alibaba.fescar.core.exception.TransactionExceptionCode;
 import com.alibaba.fescar.core.protocol.AbstractResultMessage;
-
 import io.netty.buffer.ByteBuf;
+
+import java.nio.ByteBuffer;
 
 public abstract class AbstractTransactionResponse extends AbstractResultMessage {
 

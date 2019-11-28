@@ -16,15 +16,15 @@
 
 package com.alibaba.fescar.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -38,17 +38,15 @@ public class NetUtil {
     private static final String LOCALHOST = "127.0.0.1";
 
     private static final String ANYHOST = "0.0.0.0";
-
-    private static volatile InetAddress LOCAL_ADDRESS = null;
-
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
+    private static volatile InetAddress LOCAL_ADDRESS = null;
 
     public static String toStringAddress(SocketAddress address) {
         return toStringAddress((InetSocketAddress) address);
     }
 
     public static String toIpAddress(SocketAddress address) {
-        InetSocketAddress inetSocketAddress = (InetSocketAddress)address;
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
         return inetSocketAddress.getAddress().getHostAddress();
     }
 
@@ -70,7 +68,7 @@ public class NetUtil {
         return new InetSocketAddress(host, port);
     }
 
-    public static long toLong(String address){
+    public static long toLong(String address) {
         InetSocketAddress ad = toInetSocketAddress(address);
         String[] ip = ad.getAddress().getHostAddress().split("\\.");
         long r = 0;

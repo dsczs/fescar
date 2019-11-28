@@ -28,7 +28,9 @@ public enum GlobalStatus {
     Begin,
 
 
-    /** PHASE 2: Running Status: may be changed any time. */
+    /**
+     * PHASE 2: Running Status: may be changed any time.
+     */
 
     // Committing.
     Committing,
@@ -49,7 +51,9 @@ public enum GlobalStatus {
     TimeoutRollbackRetrying,
 
 
-    /** PHASE 2: Final Status: will NOT change any more. */
+    /**
+     * PHASE 2: Final Status: will NOT change any more.
+     */
 
     // Finally: global transaction is successfully committed.
     Committed,

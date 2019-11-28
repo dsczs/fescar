@@ -16,16 +16,16 @@
 
 package com.alibaba.fescar.server;
 
-import java.io.IOException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fescar.common.XID;
 import com.alibaba.fescar.common.util.NetUtil;
 import com.alibaba.fescar.core.rpc.netty.RpcServer;
 import com.alibaba.fescar.server.coordinator.DefaultCoordinator;
 import com.alibaba.fescar.server.session.SessionHolder;
+
+import java.io.IOException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Server {
 
@@ -34,7 +34,7 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         RpcServer rpcServer = new RpcServer(WORKING_THREADS);
-        
+
         int port = 8091;
         if (args.length == 0) {
             rpcServer.setListenPort(port);
@@ -49,7 +49,7 @@ public class Server {
             }
             rpcServer.setListenPort(port);
         }
-        
+
         String dataDir = null;
         if (args.length > 1) {
             dataDir = args[1];

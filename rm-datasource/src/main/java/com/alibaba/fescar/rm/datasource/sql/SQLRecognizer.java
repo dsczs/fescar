@@ -39,8 +39,8 @@ public interface SQLRecognizer {
      * SELECT id, name FROM user u WHERE ...
      * TableRecords name should be 'user' for this SQL, without alias 'u'.
      *
-     * @see #getTableSource()
      * @return table name.
+     * @see #getTableSource()
      */
     String getTableName();
 

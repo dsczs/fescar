@@ -18,12 +18,12 @@ package com.alibaba.fescar.rm.datasource.undo;
 
 public class UndoLogParserFactory {
 
-    private static class SingletonHolder {
-        private static final UndoLogParser INSTANCE = new JSONBasedUndoLogParser();
-    }
-
     public static final UndoLogParser getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+
+    private static class SingletonHolder {
+        private static final UndoLogParser INSTANCE = new JSONBasedUndoLogParser();
     }
 
 

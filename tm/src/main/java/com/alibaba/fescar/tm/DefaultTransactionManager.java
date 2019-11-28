@@ -16,8 +16,6 @@
 
 package com.alibaba.fescar.tm;
 
-import java.util.concurrent.TimeoutException;
-
 import com.alibaba.fescar.common.XID;
 import com.alibaba.fescar.core.exception.TransactionException;
 import com.alibaba.fescar.core.exception.TransactionExceptionCode;
@@ -35,13 +33,15 @@ import com.alibaba.fescar.core.protocol.transaction.GlobalStatusRequest;
 import com.alibaba.fescar.core.protocol.transaction.GlobalStatusResponse;
 import com.alibaba.fescar.core.rpc.netty.TmRpcClient;
 
+import java.util.concurrent.TimeoutException;
+
 /**
  * The type Default transaction manager.
  */
 public class DefaultTransactionManager implements TransactionManager {
 
-    private static class SingletonHolder {
-        private static final TransactionManager INSTANCE = new DefaultTransactionManager();
+    private DefaultTransactionManager() {
+
     }
 
     /**
@@ -51,10 +51,6 @@ public class DefaultTransactionManager implements TransactionManager {
      */
     public static TransactionManager get() {
         return SingletonHolder.INSTANCE;
-    }
-
-    private DefaultTransactionManager() {
-
     }
 
     @Override
@@ -99,5 +95,9 @@ public class DefaultTransactionManager implements TransactionManager {
         } catch (TimeoutException toe) {
             throw new TransactionException(TransactionExceptionCode.IO, toe);
         }
+    }
+
+    private static class SingletonHolder {
+        private static final TransactionManager INSTANCE = new DefaultTransactionManager();
     }
 }

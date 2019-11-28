@@ -16,11 +16,10 @@
 
 package com.alibaba.fescar.core.protocol.transaction;
 
-import java.nio.ByteBuffer;
-
 import com.alibaba.fescar.core.model.BranchStatus;
-
 import io.netty.buffer.ByteBuf;
+
+import java.nio.ByteBuffer;
 
 public abstract class AbstractBranchEndResponse extends AbstractTransactionResponse {
 

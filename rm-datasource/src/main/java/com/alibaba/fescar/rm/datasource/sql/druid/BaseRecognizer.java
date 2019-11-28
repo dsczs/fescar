@@ -20,14 +20,6 @@ import com.alibaba.fescar.rm.datasource.sql.SQLRecognizer;
 
 public abstract class BaseRecognizer implements SQLRecognizer {
 
-    public static class VMarker {
-        @Override
-        public String toString() {
-            return "?";
-        }
-
-    }
-
     protected String originalSQL;
 
     public BaseRecognizer(String originalSQL) {
@@ -38,5 +30,13 @@ public abstract class BaseRecognizer implements SQLRecognizer {
     @Override
     public String getOriginalSQL() {
         return originalSQL;
+    }
+
+    public static class VMarker {
+        @Override
+        public String toString() {
+            return "?";
+        }
+
     }
 }

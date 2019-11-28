@@ -19,7 +19,6 @@ package com.alibaba.fescar.core.rpc;
 import com.alibaba.fescar.core.protocol.RegisterRMRequest;
 import com.alibaba.fescar.core.protocol.RegisterTMRequest;
 import com.alibaba.fescar.core.rpc.netty.RegisterCheckAuthHandler;
-
 import io.netty.channel.ChannelHandlerContext;
 
 /**

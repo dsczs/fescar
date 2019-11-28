@@ -16,15 +16,20 @@
 
 package com.alibaba.fescar.rm.datasource;
 
+import com.alibaba.fescar.rm.datasource.exec.ExecuteTemplate;
+import com.alibaba.fescar.rm.datasource.exec.StatementCallback;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.alibaba.fescar.rm.datasource.exec.ExecuteTemplate;
-import com.alibaba.fescar.rm.datasource.exec.StatementCallback;
-
 public class PreparedStatementProxy extends AbstractPreparedStatementProxy implements PreparedStatement, ParametersHolder {
+
+    public PreparedStatementProxy(AbstractConnectionProxy connectionProxy, PreparedStatement targetStatement, String targetSQL) throws SQLException {
+        super(connectionProxy, targetStatement, targetSQL);
+        init();
+    }
 
     @Override
     public ArrayList<Object>[] getParameters() {
@@ -37,11 +42,6 @@ public class PreparedStatementProxy extends AbstractPreparedStatementProxy imple
         for (int i = 0; i < paramCount; i++) {
             parameters[i] = new ArrayList<>();
         }
-    }
-
-    public PreparedStatementProxy(AbstractConnectionProxy connectionProxy, PreparedStatement targetStatement, String targetSQL) throws SQLException {
-        super(connectionProxy, targetStatement, targetSQL);
-        init();
     }
 
     @Override

@@ -16,17 +16,16 @@
 
 package com.alibaba.fescar.rm.datasource.undo;
 
-import java.sql.Types;
-import java.util.ArrayList;
-
 import com.alibaba.fescar.rm.datasource.sql.SQLType;
 import com.alibaba.fescar.rm.datasource.sql.struct.Field;
 import com.alibaba.fescar.rm.datasource.sql.struct.Row;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableMeta;
 import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.sql.Types;
+import java.util.ArrayList;
 
 public class BranchUndoLogTest {
 
@@ -68,7 +67,6 @@ public class BranchUndoLogTest {
 
         BranchUndoLog decodeObj = UndoLogParserFactory.getInstance().decode(encodeString);
         Assert.assertEquals(decodeObj.getBranchId(), branchUndoLog.getBranchId());
-
 
 
     }

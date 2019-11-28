@@ -16,13 +16,13 @@
 
 package com.alibaba.fescar.rm.datasource.sql.struct;
 
+import com.alibaba.fescar.common.exception.NotSupportYetException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.alibaba.fescar.common.exception.NotSupportYetException;
 
 public class TableMeta {
     private String tableName;
@@ -44,7 +44,9 @@ public class TableMeta {
         if (col == null) {
             if (colName.charAt(0) == '`') {
                 col = allColumns.get(s.substring(1, colName.length() - 1));
-            } else { col = allColumns.get("`" + s + "`"); }
+            } else {
+                col = allColumns.get("`" + s + "`");
+            }
         }
         return col;
     }

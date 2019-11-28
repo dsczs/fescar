@@ -16,14 +16,14 @@
 
 package com.alibaba.fescar.core.protocol;
 
+import io.netty.buffer.ByteBuf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.netty.buffer.ByteBuf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
  * @FileName: MergedWarpMessage
  * @Description:
  */
-public class MergedWarpMessage extends AbstractMessage implements Serializable,MergeMessage {
+public class MergedWarpMessage extends AbstractMessage implements Serializable, MergeMessage {
     private static final long serialVersionUID = -5758802337446717090L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergedWarpMessage.class);
     public List<AbstractMessage> msgs = new ArrayList<AbstractMessage>();
     public List<Long> msgIds = new ArrayList<Long>();
-    private static final Logger LOGGER = LoggerFactory.getLogger(MergedWarpMessage.class);
 
     @Override
     public short getTypeCode() {

@@ -16,8 +16,6 @@
 
 package com.alibaba.fescar.rm.datasource.undo.mysql;
 
-import java.util.List;
-
 import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 import com.alibaba.fescar.rm.datasource.sql.struct.Field;
 import com.alibaba.fescar.rm.datasource.sql.struct.KeyType;
@@ -26,7 +24,13 @@ import com.alibaba.fescar.rm.datasource.sql.struct.TableRecords;
 import com.alibaba.fescar.rm.datasource.undo.AbstractUndoExecutor;
 import com.alibaba.fescar.rm.datasource.undo.SQLUndoLog;
 
+import java.util.List;
+
 public class MySQLUndoUpdateExecutor extends AbstractUndoExecutor {
+
+    public MySQLUndoUpdateExecutor(SQLUndoLog sqlUndoLog) {
+        super(sqlUndoLog);
+    }
 
     @Override
     protected String buildUndoSQL() {
@@ -53,10 +57,6 @@ public class MySQLUndoUpdateExecutor extends AbstractUndoExecutor {
 
         }
         return mainSQL.append(where).toString();
-    }
-
-    public MySQLUndoUpdateExecutor(SQLUndoLog sqlUndoLog) {
-        super(sqlUndoLog);
     }
 
     @Override

@@ -16,16 +16,16 @@
 
 package com.alibaba.fescar.server.session;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import com.alibaba.fescar.core.exception.TransactionException;
 import com.alibaba.fescar.core.model.BranchStatus;
 import com.alibaba.fescar.core.model.BranchType;
 import com.alibaba.fescar.core.model.GlobalStatus;
 import com.alibaba.fescar.server.UUIDGenerator;
 import com.alibaba.fescar.server.store.SessionStorable;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class GlobalSession implements SessionLifecycle, SessionStorable {
 
@@ -46,6 +46,26 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     private boolean active;
 
     private ArrayList<BranchSession> branchSessions = new ArrayList<>();
+    private ArrayList<SessionLifecycleListener> lifecycleListeners = new ArrayList<>();
+
+    public GlobalSession() {
+    }
+
+    public GlobalSession(String applicationId, String transactionServiceGroup, String transactionName, int timeout) {
+        this.transactionId = UUIDGenerator.generateUUID();
+        this.status = GlobalStatus.Begin;
+
+        this.applicationId = applicationId;
+        this.transactionServiceGroup = transactionServiceGroup;
+        this.transactionName = transactionName;
+        this.timeout = timeout;
+    }
+
+    public static GlobalSession createGlobalSession(String applicationId, String txServiceGroup, String txName,
+                                                    int timeout) {
+        GlobalSession session = new GlobalSession(applicationId, txServiceGroup, txName, timeout);
+        return session;
+    }
 
     public boolean add(BranchSession branchSession) {
         return branchSessions.add(branchSession);
@@ -54,8 +74,6 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     public boolean remove(BranchSession branchSession) {
         return branchSessions.remove(branchSession);
     }
-
-    private ArrayList<SessionLifecycleListener> lifecycleListeners = new ArrayList<>();
 
     public boolean canBeCommittedAsync() {
         for (BranchSession branchSession : branchSessions) {
@@ -91,7 +109,7 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
 
     @Override
     public void changeBranchStatus(BranchSession branchSession, BranchStatus status)
-        throws TransactionException {
+            throws TransactionException {
         for (SessionLifecycleListener lifecycleListener : lifecycleListeners) {
             lifecycleListener.onBranchStatusChange(this, branchSession, status);
         }
@@ -101,6 +119,10 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
     @Override
     public boolean isActive() {
         return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override
@@ -185,18 +207,6 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         return reversed;
     }
 
-    public GlobalSession() {}
-
-    public GlobalSession(String applicationId, String transactionServiceGroup, String transactionName, int timeout) {
-        this.transactionId = UUIDGenerator.generateUUID();
-        this.status = GlobalStatus.Begin;
-
-        this.applicationId = applicationId;
-        this.transactionServiceGroup = transactionServiceGroup;
-        this.transactionName = transactionName;
-        this.timeout = timeout;
-    }
-
     public long getTransactionId() {
         return transactionId;
     }
@@ -229,16 +239,6 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         return beginTime;
     }
 
-    public static GlobalSession createGlobalSession(String applicationId, String txServiceGroup, String txName,
-                                                    int timeout) {
-        GlobalSession session = new GlobalSession(applicationId, txServiceGroup, txName, timeout);
-        return session;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     @Override
     public byte[] encode() {
         ByteBuffer byteBuffer = ByteBuffer.allocate(512);
@@ -246,24 +246,24 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         byteBuffer.putInt(timeout);
         if (null != applicationId) {
             byte[] byApplicationId = applicationId.getBytes();
-            byteBuffer.putShort((short)byApplicationId.length);
+            byteBuffer.putShort((short) byApplicationId.length);
             byteBuffer.put(byApplicationId);
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
         if (null != transactionServiceGroup) {
             byte[] byServiceGroup = transactionServiceGroup.getBytes();
-            byteBuffer.putShort((short)byServiceGroup.length);
+            byteBuffer.putShort((short) byServiceGroup.length);
             byteBuffer.put(byServiceGroup);
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
         if (null != transactionName) {
             byte[] byTxName = transactionName.getBytes();
-            byteBuffer.putShort((short)byTxName.length);
+            byteBuffer.putShort((short) byTxName.length);
             byteBuffer.put(byTxName);
         } else {
-            byteBuffer.putShort((short)0);
+            byteBuffer.putShort((short) 0);
         }
         byteBuffer.putLong(beginTime);
         byteBuffer.flip();

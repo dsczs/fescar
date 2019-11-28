@@ -29,12 +29,14 @@ public @interface GlobalTransactional {
 
     /**
      * Global transaction timeoutMills in MILLISECONDS.
+     *
      * @return timeoutMills in MILLISECONDS.
      */
     int timeoutMills() default 60000;
 
     /**
      * Given name of the global transaction instance.
+     *
      * @return Given name.
      */
     String name() default "";

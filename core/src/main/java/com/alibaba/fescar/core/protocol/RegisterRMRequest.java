@@ -16,9 +16,9 @@
 
 package com.alibaba.fescar.core.protocol;
 
-import java.io.Serializable;
-
 import io.netty.buffer.ByteBuf;
+
+import java.io.Serializable;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -47,6 +47,7 @@ public class RegisterRMRequest extends AbstractIdentifyRequest implements Serial
     public void setResourceIds(String resourceIds) {
         this.resourceIds = resourceIds;
     }
+
     @Override
     public short getTypeCode() {
         return TYPE_REG_RM;
@@ -138,9 +139,9 @@ public class RegisterRMRequest extends AbstractIdentifyRequest implements Serial
     @Override
     public String toString() {
         return "RegisterRMRequest{" +
-            "resourceIds='" + resourceIds + '\'' +
-            ", applicationId='" + applicationId + '\'' +
-            ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
-            '}';
+                "resourceIds='" + resourceIds + '\'' +
+                ", applicationId='" + applicationId + '\'' +
+                ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
+                '}';
     }
 }

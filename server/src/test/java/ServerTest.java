@@ -14,13 +14,13 @@
  *  limitations under the License.
  */
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fescar.core.rpc.netty.RpcServer;
 import com.alibaba.fescar.server.UUIDGenerator;
 import com.alibaba.fescar.server.coordinator.DefaultCoordinator;
+
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com

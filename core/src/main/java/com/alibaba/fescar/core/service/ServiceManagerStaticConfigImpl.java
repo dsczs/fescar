@@ -28,6 +28,7 @@ import static com.alibaba.fescar.core.service.ConfigurationKeys.SERVER_NODE_SPLI
 public class ServiceManagerStaticConfigImpl implements ServiceManager {
 
     private Configuration configuration = ConfigurationFactory.getInstance();
+    private String[] serverAddresses = null;
 
     @Override
     public void register(String txServiceGroup, String address) {
@@ -46,8 +47,6 @@ public class ServiceManagerStaticConfigImpl implements ServiceManager {
         throw new NotSupportYetException("Watch");
 
     }
-
-    private String[] serverAddresses = null;
 
     @Override
     public String[] lookup(String txServiceGroup) {

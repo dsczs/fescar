@@ -16,9 +16,6 @@
 
 package com.alibaba.fescar.core.rpc.netty;
 
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeoutException;
-
 import com.alibaba.fescar.common.util.NetUtil;
 import com.alibaba.fescar.core.protocol.HeartbeatMessage;
 import com.alibaba.fescar.core.protocol.RegisterRMRequest;
@@ -30,7 +27,6 @@ import com.alibaba.fescar.core.rpc.RpcContext;
 import com.alibaba.fescar.core.rpc.ServerMessageListener;
 import com.alibaba.fescar.core.rpc.ServerMessageSender;
 import com.alibaba.fescar.core.rpc.TransactionMessageHandler;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,6 +34,9 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The type Abstract rpc server.
@@ -61,6 +60,15 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
     private RegisterCheckAuthHandler checkAuthHandler;
 
     /**
+     * Instantiates a new Abstract rpc server.
+     *
+     * @param messageExecutor the message executor
+     */
+    public RpcServer(ThreadPoolExecutor messageExecutor) {
+        super(new NettyServerConfig(), messageExecutor);
+    }
+
+    /**
      * Sets transactionMessageHandler.
      *
      * @param transactionMessageHandler the transactionMessageHandler
@@ -79,15 +87,6 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
                            RegisterCheckAuthHandler checkAuthHandler) {
         this.transactionMessageHandler = transactionMessageHandler;
         this.checkAuthHandler = checkAuthHandler;
-    }
-
-    /**
-     * Instantiates a new Abstract rpc server.
-     *
-     * @param messageExecutor the message executor
-     */
-    public RpcServer(ThreadPoolExecutor messageExecutor) {
-        super(new NettyServerConfig(), messageExecutor);
     }
 
     /**
@@ -127,7 +126,7 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
         super.init();
         setChannelHandlers(RpcServer.this);
         DefaultServerMessageListenerImpl defaultServerMessageListenerImpl = new DefaultServerMessageListenerImpl(
-            transactionMessageHandler);
+                transactionMessageHandler);
         defaultServerMessageListenerImpl.setServerMessageSender(this);
         this.setServerMessageListener(defaultServerMessageListenerImpl);
         super.start();
@@ -153,7 +152,7 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof IdleStateEvent) {
             debugLog("idle:" + evt);
-            IdleStateEvent idleStateEvent = (IdleStateEvent)evt;
+            IdleStateEvent idleStateEvent = (IdleStateEvent) evt;
             if (idleStateEvent.state() == IdleState.READER_IDLE) {
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("channel:" + ctx.channel() + " read idle.");
@@ -205,10 +204,10 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
      * Send request with response object.
      * send syn request for rm
      *
-     * @param resourceId         the db key
-     * @param clientId      the client ip
-     * @param message           the message
-     * @param timeout       the timeout
+     * @param resourceId the db key
+     * @param clientId   the client ip
+     * @param message    the message
+     * @param timeout    the timeout
      * @return the object
      * @throws TimeoutException the timeout exception
      */
@@ -218,7 +217,7 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
         Channel clientChannel = ChannelManager.getChannel(resourceId, clientId);
         if (clientChannel == null) {
             throw new RuntimeException("rm client is not connected. dbkey:" + resourceId
-                + ",clientId:" + clientId);
+                    + ",clientId:" + clientId);
 
         }
         return sendAsyncRequestWithResponse(null, clientChannel, message, timeout);
@@ -227,15 +226,15 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
     /**
      * Send request with response object.
      *
-     * @param resourceId         the db key
-     * @param clientId      the client ip
-     * @param message           the msg
+     * @param resourceId the db key
+     * @param clientId   the client ip
+     * @param message    the msg
      * @return the object
      * @throws TimeoutException the timeout exception
      */
     @Override
     public Object sendSyncRequest(String resourceId, String clientId, Object message)
-        throws TimeoutException {
+            throws TimeoutException {
         return sendSyncRequest(resourceId, clientId, message, NettyServerConfig.getRpcRequestTimeout());
     }
 
@@ -249,8 +248,8 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
     @Override
     public void dispatch(long msgId, ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof RegisterRMRequest) {
-            serverMessageListener.onRegRmMessage(msgId, ctx, (RegisterRMRequest)msg, this,
-                checkAuthHandler);
+            serverMessageListener.onRegRmMessage(msgId, ctx, (RegisterRMRequest) msg, this,
+                    checkAuthHandler);
         } else {
             if (ChannelManager.isRegistered(ctx.channel())) {
                 serverMessageListener.onTrxMessage(msgId, ctx, msg, this);
@@ -311,12 +310,12 @@ public class RpcServer extends AbstractRpcRemotingServer implements ServerMessag
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof RpcMessage) {
-            RpcMessage rpcMessage = (RpcMessage)msg;
+            RpcMessage rpcMessage = (RpcMessage) msg;
             debugLog("read:" + rpcMessage.getBody().toString());
             if (rpcMessage.getBody() instanceof RegisterTMRequest) {
                 RegisterTMRequest request
-                    = (RegisterTMRequest)rpcMessage
-                    .getBody();
+                        = (RegisterTMRequest) rpcMessage
+                        .getBody();
                 serverMessageListener.onRegTmMessage(rpcMessage.getId(), ctx, request, this, checkAuthHandler);
                 return;
             }

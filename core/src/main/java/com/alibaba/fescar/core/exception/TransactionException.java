@@ -20,13 +20,10 @@ public class TransactionException extends Exception {
 
     protected TransactionExceptionCode code = TransactionExceptionCode.Unknown;
 
-    public TransactionExceptionCode getCode() {
-        return code;
-    }
-
     public TransactionException(TransactionExceptionCode code) {
         this.code = code;
     }
+
     public TransactionException(TransactionExceptionCode code, Throwable cause) {
         super(cause);
         this.code = code;
@@ -52,5 +49,9 @@ public class TransactionException extends Exception {
     public TransactionException(TransactionExceptionCode code, String message, Throwable cause) {
         super(message, cause);
         this.code = code;
+    }
+
+    public TransactionExceptionCode getCode() {
+        return code;
     }
 }

@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.rm.datasource.sql.struct;
 
+import com.alibaba.fescar.common.exception.NotSupportYetException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.alibaba.fescar.common.exception.NotSupportYetException;
 
 public class Row {
 

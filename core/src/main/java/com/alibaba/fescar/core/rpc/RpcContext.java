@@ -16,19 +16,18 @@
 
 package com.alibaba.fescar.core.rpc;
 
+import com.alibaba.fescar.common.Constants;
+import com.alibaba.fescar.core.rpc.netty.NettyPoolKey.TransactionRole;
+import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.alibaba.fescar.common.Constants;
-import com.alibaba.fescar.core.rpc.netty.NettyPoolKey.TransactionRole;
-
-import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type rpc context.
@@ -71,6 +70,28 @@ public class RpcContext {
      * dbkeyRm
      */
     private ConcurrentMap<String, ConcurrentMap<Integer, RpcContext>> clientRMHolderMap;
+
+    private static String getAddressFromChannel(Channel channel) {
+        SocketAddress socketAddress = channel.remoteAddress();
+        String address = socketAddress.toString();
+        if (socketAddress.toString().indexOf(Constants.ENDPOINT_BEGIN_CHAR) == 0) {
+            address = socketAddress.toString().substring(Constants.ENDPOINT_BEGIN_CHAR.length());
+        }
+        return address;
+    }
+
+    private static Integer getClientPortFromChannel(Channel channel) {
+        String address = getAddressFromChannel(channel);
+        Integer port = 0;
+        try {
+            if (address.contains(Constants.IP_PORT_SPLIT_CHAR)) {
+                port = Integer.parseInt(address.substring(address.lastIndexOf(Constants.IP_PORT_SPLIT_CHAR) + 1));
+            }
+        } catch (NumberFormatException exx) {
+            LOGGER.error(exx.getMessage());
+        }
+        return port;
+    }
 
     /**
      * Release.
@@ -180,6 +201,10 @@ public class RpcContext {
         return clientId;
     }
 
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
     /**
      * Gets get channel.
      *
@@ -270,28 +295,6 @@ public class RpcContext {
         this.version = version;
     }
 
-    private static String getAddressFromChannel(Channel channel) {
-        SocketAddress socketAddress = channel.remoteAddress();
-        String address = socketAddress.toString();
-        if (socketAddress.toString().indexOf(Constants.ENDPOINT_BEGIN_CHAR) == 0) {
-            address = socketAddress.toString().substring(Constants.ENDPOINT_BEGIN_CHAR.length());
-        }
-        return address;
-    }
-
-    private static Integer getClientPortFromChannel(Channel channel) {
-        String address = getAddressFromChannel(channel);
-        Integer port = 0;
-        try {
-            if (address.contains(Constants.IP_PORT_SPLIT_CHAR)) {
-                port = Integer.parseInt(address.substring(address.lastIndexOf(Constants.IP_PORT_SPLIT_CHAR) + 1));
-            }
-        } catch (NumberFormatException exx) {
-            LOGGER.error(exx.getMessage());
-        }
-        return port;
-    }
-
     /**
      * Gets get resource sets.
      *
@@ -328,25 +331,23 @@ public class RpcContext {
      * @param resource the resource
      */
     public void addResources(Set<String> resource) {
-        if (null == resource) { return; }
+        if (null == resource) {
+            return;
+        }
         if (null == resourceSets) {
             this.resourceSets = new HashSet<String>();
         }
         this.resourceSets.addAll(resource);
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
     @Override
     public String toString() {
         return "RpcContext{" +
-            "applicationId='" + applicationId + '\'' +
-            ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
-            ", clientId='" + clientId + '\'' +
-            ", channel=" + channel +
-            ", resourceSets=" + resourceSets +
-            '}';
+                "applicationId='" + applicationId + '\'' +
+                ", transactionServiceGroup='" + transactionServiceGroup + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", channel=" + channel +
+                ", resourceSets=" + resourceSets +
+                '}';
     }
 }

@@ -28,28 +28,28 @@ import java.util.concurrent.TimeoutException;
  * @Description:
  */
 public class MessageFuture {
+    private static final Object NULL = new Object();
+    private final CountDownLatch latch = new CountDownLatch(1);
     private RpcMessage requestMessage;
     private long timeout;
     private long start = System.currentTimeMillis();
     private volatile Object resultMessage;
-    private static final Object NULL = new Object();
-    private final CountDownLatch latch = new CountDownLatch(1);
 
     public boolean isTimeout() {
         return System.currentTimeMillis() - start > timeout;
     }
 
     public Object get(long timeout, TimeUnit unit) throws TimeoutException,
-        InterruptedException {
+            InterruptedException {
         boolean success = latch.await(timeout, unit);
         if (!success) {
             throw new TimeoutException("cost " + (System.currentTimeMillis() - start) + " ms");
         }
 
         if (resultMessage instanceof RuntimeException) {
-            throw (RuntimeException)resultMessage;
+            throw (RuntimeException) resultMessage;
         } else if (resultMessage instanceof Throwable) {
-            throw new RuntimeException((Throwable)resultMessage);
+            throw new RuntimeException((Throwable) resultMessage);
         }
 
         return resultMessage;

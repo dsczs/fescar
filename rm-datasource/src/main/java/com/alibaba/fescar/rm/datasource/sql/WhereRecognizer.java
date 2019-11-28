@@ -16,9 +16,9 @@
 
 package com.alibaba.fescar.rm.datasource.sql;
 
-import java.util.ArrayList;
-
 import com.alibaba.fescar.rm.datasource.ParametersHolder;
+
+import java.util.ArrayList;
 
 public interface WhereRecognizer extends SQLRecognizer {
 

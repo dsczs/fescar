@@ -16,10 +16,10 @@
 
 package com.alibaba.fescar.core.rpc;
 
+import io.netty.channel.Channel;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-
-import io.netty.channel.Channel;
 
 /**
  * @Author: jimin.jm@alibaba-inc.com
@@ -41,9 +41,9 @@ public interface ServerMessageSender {
      * Sync call to RM with timeout.
      *
      * @param resourceId Resource ID
-     * @param clientId Client ID
-     * @param message Request message
-     * @param timeout timeout of the call
+     * @param clientId   Client ID
+     * @param message    Request message
+     * @param timeout    timeout of the call
      * @return Response message
      * @throws IOException .
      */
@@ -52,10 +52,9 @@ public interface ServerMessageSender {
     /**
      * Sync call to RM
      *
-     *
      * @param resourceId Resource ID
-     * @param clientId Client ID
-     * @param message Request message
+     * @param clientId   Client ID
+     * @param message    Request message
      * @return Response message
      * @throws IOException .
      */

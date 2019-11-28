@@ -16,11 +16,11 @@
 
 package com.alibaba.fescar.rm.datasource;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fescar.core.model.Resource;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DataSourceProxy extends AbstractDataSourceProxy implements Resource {
 
@@ -31,6 +31,7 @@ public class DataSourceProxy extends AbstractDataSourceProxy implements Resource
     public DataSourceProxy(DruidDataSource targetDataSource) {
         super(targetDataSource);
     }
+
     public DataSourceProxy(DruidDataSource targetDataSource, String resourceGroupId) {
         super(targetDataSource);
         this.resourceGroupId = resourceGroupId;

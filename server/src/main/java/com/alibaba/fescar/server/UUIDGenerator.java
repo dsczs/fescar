@@ -16,13 +16,13 @@
 
 package com.alibaba.fescar.server;
 
+import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.alibaba.fescar.common.exception.ShouldNeverHappenException;
 
 public class UUIDGenerator {
 

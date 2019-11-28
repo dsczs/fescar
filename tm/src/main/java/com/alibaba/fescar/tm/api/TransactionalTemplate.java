@@ -41,7 +41,7 @@ public class TransactionalTemplate {
 
         } catch (TransactionException txe) {
             throw new TransactionalExecutor.ExecutionException(tx, txe,
-                TransactionalExecutor.Code.BeginFailure);
+                    TransactionalExecutor.Code.BeginFailure);
 
         }
 
@@ -63,7 +63,7 @@ public class TransactionalTemplate {
             } catch (TransactionException txe) {
                 // 3.2 Failed to rollback
                 throw new TransactionalExecutor.ExecutionException(tx, txe,
-                    TransactionalExecutor.Code.RollbackFailure, ex);
+                        TransactionalExecutor.Code.RollbackFailure, ex);
 
             }
 
@@ -76,7 +76,7 @@ public class TransactionalTemplate {
         } catch (TransactionException txe) {
             // 4.1 Failed to commit
             throw new TransactionalExecutor.ExecutionException(tx, txe,
-                TransactionalExecutor.Code.CommitFailure);
+                    TransactionalExecutor.Code.CommitFailure);
 
         }
         return rs;
